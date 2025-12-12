@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Nav } from "./components/Nav";
+import { Footer } from "./components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,10 +20,12 @@ export const metadata: Metadata = {
     default: "harelcoman",
     template: "%s · harelcoman",
   },
-  description: "Harel Coman — personal site. Coming soon.",
+  description:
+    "Harel Coman — Staff Engineer & AI Lead. Frontend architecture, UI infrastructure, performance, accessibility, and AI-driven developer experience.",
   openGraph: {
     title: "harelcoman",
-    description: "Harel Coman — personal site. Coming soon.",
+    description:
+      "Harel Coman — Staff Engineer & AI Lead. Frontend architecture, UI infrastructure, performance, accessibility, and AI-driven developer experience.",
     url: "/",
     siteName: "harelcoman",
     type: "website",
@@ -37,7 +41,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary",
     title: "harelcoman",
-    description: "Harel Coman — personal site. Coming soon.",
+    description:
+      "Harel Coman — Staff Engineer & AI Lead. Frontend architecture, UI infrastructure, performance, accessibility, and AI-driven developer experience.",
     images: ["/twitter-image"],
   },
 };
@@ -79,7 +84,11 @@ export default function RootLayout({
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify([websiteJsonLd, personJsonLd]) }}
         />
-        {children}
+        <div className="min-h-screen bg-zinc-50 text-zinc-950 dark:bg-black dark:text-zinc-50">
+          <Nav />
+          <main className="pb-16">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   );
