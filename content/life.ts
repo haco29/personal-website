@@ -5,7 +5,7 @@ export type LifeHobby = {
 
 export const life = {
   intro:
-    "O00utside of work, I recharge with games, sports, and family time — still chasing tiny improvements, just with more laughter.",
+    "Outside of work, I recharge with games, sports, and family time — still chasing tiny improvements, just with more laughter.",
   hobbies: [
     {
       title: "Video games",
