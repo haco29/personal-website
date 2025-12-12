@@ -1,0 +1,57 @@
+name: CI
+
+# This workflow runs quality checks on pull requests
+# To block PRs when checks fail, set up branch protection rules:
+# 1. Go to your GitHub repository
+# 2. Settings → Branches → Add rule (or edit existing rule)
+# 3. Branch name pattern: main (or your default branch)
+# 4. Check "Require status checks to pass before merging"
+# 5. Search for and select "check" from the list of status checks (this is the job name)
+# 6. Optionally check "Require branches to be up to date before merging"
+# 7. Save the rule
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main, master]
+
+jobs:
+  check:
+    name: Run pnpm check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run pnpm check
+        run: pnpm check
