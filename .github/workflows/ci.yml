@@ -6,13 +6,15 @@ name: CI
 # 2. Settings → Branches → Add rule (or edit existing rule)
 # 3. Branch name pattern: main (or your default branch)
 # 4. Check "Require status checks to pass before merging"
-# 5. Select "CI" from the list of status checks
+# 5. Search for and select "check" from the list of status checks (this is the job name)
 # 6. Optionally check "Require branches to be up to date before merging"
 # 7. Save the rule
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  push:
+    branches: [main, master]
 
 jobs:
   check:
