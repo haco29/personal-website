@@ -5,5 +5,3 @@ export function Tag({ children }: { children: string }) {
     </span>
   );
 }
-
-
