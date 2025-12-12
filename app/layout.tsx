@@ -25,11 +25,20 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "harelcoman",
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Harel Coman",
+      },
+    ],
   },
   twitter: {
     card: "summary",
     title: "harelcoman",
     description: "Harel Coman — personal site. Coming soon.",
+    images: ["/twitter-image"],
   },
 };
 
@@ -38,9 +47,40 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Harel Coman",
+    url: "https://harelcoman.dev/",
+    image: "https://harelcoman.dev/opengraph-image",
+    sameAs: [
+      "https://github.com/haco29",
+      "https://www.linkedin.com/in/harel-coman-16703289/",
+      "https://dev.to/haco29/series/34035",
+    ],
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "harelcoman",
+    url: "https://harelcoman.dev/",
+    publisher: {
+      "@type": "Person",
+      name: "Harel Coman",
+    },
+  };
+
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([websiteJsonLd, personJsonLd]) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

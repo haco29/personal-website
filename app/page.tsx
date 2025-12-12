@@ -35,6 +35,12 @@ export default function Home() {
               </a>
               <a
                 className="inline-flex h-12 items-center justify-center rounded-full border border-black/10 bg-white px-6 text-base font-medium text-zinc-950 transition-colors hover:bg-zinc-50 dark:border-white/15 dark:bg-black dark:text-zinc-50 dark:hover:bg-white/5"
+                href="mailto:haco29@gmail.com"
+              >
+                Email
+              </a>
+              <a
+                className="inline-flex h-12 items-center justify-center rounded-full border border-black/10 bg-white px-6 text-base font-medium text-zinc-950 transition-colors hover:bg-zinc-50 dark:border-white/15 dark:bg-black dark:text-zinc-50 dark:hover:bg-white/5"
                 href="https://dev.to/haco29/series/34035"
                 target="_blank"
                 rel="noopener noreferrer"
