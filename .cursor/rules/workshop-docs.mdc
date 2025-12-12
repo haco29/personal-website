@@ -16,4 +16,3 @@ When implementing features in this repo:
   - **Common failures** (symptom → fix)
 - Prefer **checklist-first**, then add a small **Appendix** with the “why” and troubleshooting.
 - Keep docs concise and demo-friendly: short sections, clear headings, minimal fluff.
-
