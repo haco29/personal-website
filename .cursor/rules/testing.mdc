@@ -1,0 +1,73 @@
+---
+description: Testing standards (Phase 1: unit + integration) for personal-website
+globs:
+  - "personal-website/**/*.{ts,tsx}"
+  - "personal-website/tests/**/*.{ts,tsx}"
+---
+
+## Goal
+
+Write **fewer, smarter tests** that protect **real user behavior** and stay maintainable.
+
+Use React Testing Library’s guiding principle:
+“The more your tests resemble the way your software is used, the more confidence they can give you.”
+Reference: [React Testing Library intro](https://testing-library.com/docs/react-testing-library/intro/).
+
+## Test types (Phase 1)
+
+- **Unit tests**: `personal-website/tests/unit/**`
+  - One component at a time.
+  - Very little mocking (only boundaries like `next/link`, `next/image`).
+  - Focus on accessible output (what a user sees/uses).
+
+- **Integration tests**: `personal-website/tests/integration/**`
+  - Multiple components composed together (e.g. pages).
+  - Assert key user paths (navigation/CTAs/primary headings).
+  - Still avoid implementation assertions.
+
+## Query rules (RTL)
+
+Prefer queries that match how users and assistive tech find things:
+
+1. `getByRole` / `findByRole` with accessible name
+2. `getByLabelText` (forms)
+3. `getByText` (visible content)
+4. `getByTestId` **only as an escape hatch**
+
+Notes:
+
+- Use `findBy*` for async UI.
+- Use `queryBy*` when asserting absence.
+
+## Assertions (what to test)
+
+### Test behavior, not wiring
+
+- Prefer **one test per important behavior** over many micro-assertions.
+- Assert **user-observable contracts**:
+  - headings, links, buttons, text
+  - href/target/rel for links
+  - enabled/disabled, visible/hidden
+
+### Avoid brittle details
+
+Do **not** test:
+
+- class names / Tailwind strings
+- DOM structure (“div > div > …”)
+- internal component state
+- snapshot tests as a default approach
+
+## Mocking policy
+
+- Mock only **framework boundaries**:
+  - `next/link`, `next/image` (already mocked in `personal-website/tests/setup.tsx`)
+- Do **not** mock your own components unless there’s a strong reason.
+
+## Keep the suite small
+
+Before adding a new test, ask:
+
+- Does it cover a **real regression** we care about?
+- Will it survive a refactor (same behavior, different markup)?
+- Could we cover the same risk with a single higher-level test?
