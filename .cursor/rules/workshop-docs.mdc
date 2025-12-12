@@ -1,0 +1,19 @@
+---
+description: "Workshop-first development: every meaningful change must be teachable and documented"
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+When implementing features in this repo:
+
+- Write changes **as if you will teach them live**.
+- For every meaningful change, add/update a short doc in `workshop/` with:
+  - **Goal**
+  - **Prereqs**
+  - **Live steps** (numbered, copy/paste commands)
+  - **Verification** (how to confirm it worked)
+  - **Common failures** (symptom → fix)
+- Prefer **checklist-first**, then add a small **Appendix** with the “why” and troubleshooting.
+- Keep docs concise and demo-friendly: short sections, clear headings, minimal fluff.
+
