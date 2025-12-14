@@ -1,0 +1,6 @@
+# This directory will contain utility functions for the chatbot feature
+# - db.ts: Database connection utilities
+# - embeddings.ts: Embedding generation utilities
+# - vector-search.ts: Vector search functions
+# - build-context.ts: Context formatting for RAG
+
