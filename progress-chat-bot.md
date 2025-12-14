@@ -10,9 +10,9 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 - **Stack**: Next.js (App Router) on Vercel
 - **Database**: Vercel Postgres with pgvector extension
-- **Embeddings**: OpenAI `text-embedding-3-small` (1536 dimensions)
-- **LLM**: OpenAI GPT-4o-mini
-- **SDK**: Vercel AI SDK for streaming chat
+- **Embeddings**: Cohere `embed-v4.0` (via Vercel AI Gateway - uses Vercel account OIDC token, no API key needed)
+- **LLM**: Anthropic Claude 3.5 Sonnet (via Vercel AI Gateway - uses Vercel account OIDC token, no API key needed)
+- **SDK**: Vercel AI SDK with AI Gateway for streaming chat
 
 ## Implementation PRs
 
@@ -22,11 +22,12 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 **Changes**:
 
-- Add dependencies: `@vercel/ai`, `@vercel/postgres`, `openai`
+- Add dependencies: `ai` (Vercel AI SDK), `@vercel/postgres`
 - Add dev dependencies: `gray-matter` (for markdown parsing)
 - Create folder structure: `lib/`, `scripts/`, `scripts/migrations/`
 - Add TypeScript types file: `types/embeddings.ts`
-- Update `.env.example` with required variables
+- Note: No external API keys needed - Vercel AI Gateway uses OIDC token from Vercel account
+- For local dev: use `vc dev` or `vc env pull` to get OIDC token
 
 **Verification**:
 
@@ -43,12 +44,13 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 **Changes**:
 
 - Create `lib/db.ts` with Postgres connection using `@vercel/postgres`
-- Define types in `types/embeddings.ts`:
+- Implement type definitions in `types/embeddings.ts` (file created in PR 1):
   - `EmbeddingRow` (database row type)
   - `ChunkMetadata` (metadata structure)
   - `ContentChunk` (processed chunk type)
 - Add helper functions: `getDb()`, basic query utilities
 - Add environment variable: `POSTGRES_URL`
+- Note: Vercel AI Gateway authentication handled automatically via OIDC token (no API keys needed)
 
 **Verification**:
 
@@ -69,7 +71,7 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 - Create `embeddings` table:
   - `id` (uuid, primary key)
   - `content` (text)
-  - `embedding` (vector(1536))
+  - `embedding` (vector) - dimensions match Cohere embed-v4.0 (check model docs for exact dimensions)
   - `metadata` (jsonb)
   - `created_at` (timestamp)
 - Add index on embedding column for vector search
@@ -130,23 +132,26 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 ### PR 6: Embedding Generation Utilities
 
-**Goal**: Generate embeddings using OpenAI API
+**Goal**: Generate embeddings using Vercel AI Gateway (no external API keys)
 
 **Changes**:
 
 - Create `lib/embeddings.ts`
 - Function: `generateEmbedding(text: string): Promise<number[]>`
-- Use OpenAI `text-embedding-3-small` model
+- Use Vercel AI SDK `embed` function with model `'cohere/embed-v4.0'`
+- No API keys needed - uses Vercel account OIDC token automatically
 - Batch processing function for multiple texts
 - Error handling and retry logic
 - Rate limiting considerations
+- Note: Embedding dimensions determined by Cohere embed-v4.0 model
 
 **Verification**:
 
 - Can generate embedding for sample text
-- Embedding is 1536 dimensions
+- Embedding dimensions match database schema
 - Handles errors gracefully
 - Test with batch of texts
+- Works without external API keys (uses Vercel OIDC token)
 
 ---
 
@@ -223,15 +228,17 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 **Changes**:
 
 - Create `app/api/chat/route.ts`
-- Use Vercel AI SDK `streamText` with OpenAI
+- Use Vercel AI SDK `streamText` with Vercel AI Gateway
+- Specify model as `'anthropic/claude-3.5-sonnet'` (no API key needed - uses Vercel OIDC token)
 - Flow:
   1. Receive user message
-  2. Generate query embedding
+  2. Generate query embedding using `embed({ model: 'cohere/embed-v4.0', value: query })`
   3. Search for similar chunks (top 3-5)
   4. Build context with citations
   5. Stream response with source references
 - System prompt: instruct LLM to cite sources and only answer from provided context
 - Error handling
+- Note: Authentication handled automatically by Vercel AI Gateway when deployed
 
 **Verification**:
 
@@ -313,8 +320,10 @@ Each PR should include:
 
 ## Decisions
 
-- **Embedding Model**: OpenAI `text-embedding-3-small` (1536 dims, cost-effective)
-- **LLM**: OpenAI GPT-4o-mini (good balance of quality/cost)
+- **LLM**: Anthropic Claude 3.5 Sonnet via Vercel AI Gateway (no external API keys needed - uses Vercel account OIDC token)
+- **Embedding Model**: Cohere `embed-v4.0` via Vercel AI Gateway (no external API keys needed - uses Vercel account OIDC token)
+- **SDK**: Vercel AI SDK with AI Gateway (standard Vercel approach, supports streaming, no API key management)
+- **Authentication**: Vercel AI Gateway handles auth automatically via OIDC token when deployed; use `vc dev` for local development
 - **Chunk Size**: ~500-800 tokens (preserve semantic meaning)
 - **Retrieval**: Top 3-5 chunks (balance context vs. token usage)
 - **Vector Similarity**: Cosine similarity via pgvector
