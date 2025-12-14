@@ -1,0 +1,3 @@
+# This directory will contain SQL migration files
+# - 001_create_embeddings.sql: Initial embeddings table schema
+

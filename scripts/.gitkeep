@@ -1,0 +1,4 @@
+# This directory will contain scripts for content processing and migrations
+# - process-content.ts: Content processing scripts
+# - index-content.ts: Main indexing script
+
