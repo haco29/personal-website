@@ -1,0 +1,75 @@
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
+import { ChatWidget } from "../../app/components/ChatWidget";
+
+// Mock the Chat component to avoid API calls in unit tests
+vi.mock("../../app/components/Chat", () => ({
+  Chat: () => <div data-testid="chat-component">Chat Component</div>,
+}));
+
+describe("ChatWidget", () => {
+  it("shows toggle button and opens chat widget when clicked", async () => {
+    const user = userEvent.setup();
+    render(<ChatWidget />);
+
+    // Button should be visible with "Open chat" label
+    const openButton = screen.getByRole("button", { name: "Open chat" });
+    expect(openButton).toBeInTheDocument();
+
+    // Click to open
+    await user.click(openButton);
+
+    // Chat widget should be visible
+    expect(screen.getByRole("heading", { name: "Chat" })).toBeInTheDocument();
+    expect(screen.getByTestId("chat-component")).toBeInTheDocument();
+
+    // Toggle button label should change to "Close chat"
+    const toggleButtons = screen.getAllByRole("button", { name: "Close chat" });
+    expect(toggleButtons.length).toBeGreaterThan(0);
+  });
+
+  it("closes chat widget when close button in header is clicked", async () => {
+    const user = userEvent.setup();
+    render(<ChatWidget />);
+
+    // Open widget
+    const openButton = screen.getByRole("button", { name: "Open chat" });
+    await user.click(openButton);
+
+    // Find the header close button (not the toggle button)
+    const heading = screen.getByRole("heading", { name: "Chat" });
+    const headerCloseButton = heading.parentElement?.querySelector(
+      'button[aria-label="Close chat"]',
+    ) as HTMLElement;
+    expect(headerCloseButton).toBeInTheDocument();
+
+    // Close widget using header button
+    await user.click(headerCloseButton);
+
+    // Widget should be closed
+    expect(screen.queryByRole("heading", { name: "Chat" })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("chat-component")).not.toBeInTheDocument();
+
+    // Button should be back to "Open chat"
+    expect(screen.getByRole("button", { name: "Open chat" })).toBeInTheDocument();
+  });
+
+  it("closes chat widget when Escape key is pressed", async () => {
+    const user = userEvent.setup();
+    render(<ChatWidget />);
+
+    // Open widget
+    const openButton = screen.getByRole("button", { name: "Open chat" });
+    await user.click(openButton);
+
+    // Verify widget is open
+    expect(screen.getByRole("heading", { name: "Chat" })).toBeInTheDocument();
+
+    // Press Escape
+    await user.keyboard("{Escape}");
+
+    // Widget should be closed
+    expect(screen.queryByRole("heading", { name: "Chat" })).not.toBeInTheDocument();
+  });
+});

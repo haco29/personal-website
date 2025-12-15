@@ -1,31 +1,31 @@
 # Chatbot Progress / PR Plan
 
-This file tracks the implementation of the RAG-powered chatbot feature, broken down into small, focused PRs.
+This file tracks the implementation of the chatbot feature, broken down into small, focused PRs.
+
+📖 **See also**: [Chatbot Operations Guide](./docs/chatbot-operations.md) for local/production setup, security, cost management, and monitoring.
 
 ## Goal
 
-A chatbot that answers questions about Harel's content (talks, writing, projects) using RAG (Retrieval-Augmented Generation) with source citations.
+A chatbot that answers questions about Harel's content (talks, writing, projects) using a system prompt with static content. This MVP approach provides a fast path to shipping, with RAG (Retrieval-Augmented Generation) planned for a future phase to enable more accurate answers with source citations.
 
 ## Architecture
 
 - **Stack**: Next.js (App Router) on Vercel
-- **Database**: Vercel Postgres with pgvector extension
-- **Embeddings**: Cohere `embed-v4.0` (via Vercel AI Gateway - uses Vercel account OIDC token, no API key needed)
 - **LLM**: Anthropic Claude 3.5 Sonnet (via Vercel AI Gateway - uses Vercel account OIDC token, no API key needed)
 - **SDK**: Vercel AI SDK with AI Gateway for streaming chat
+- **System Prompt**: Static content compiled from `content/profile.ts`, `content/writing.ts`, and `content/life.ts`
 
 ## Implementation PRs
 
 ### PR 1: Project Setup & Dependencies
 
-**Goal**: Install dependencies and set up project structure
+**Goal**: Verify dependencies and set up project structure
 
 **Changes**:
 
-- Add dependencies: `ai` (Vercel AI SDK), `@vercel/postgres`
-- Add dev dependencies: `gray-matter` (for markdown parsing)
-- Create folder structure: `lib/`, `scripts/`, `scripts/migrations/`
-- Add TypeScript types file: `types/embeddings.ts`
+- Verify `ai` SDK is already installed (already in `package.json`)
+- No database dependencies needed for MVP
+- Create folder structure: `lib/` (if needed)
 - Note: No external API keys needed - Vercel AI Gateway uses OIDC token from Vercel account
 - For local dev: use `vc dev` or `vc env pull` to get OIDC token
 
@@ -37,14 +37,105 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 ---
 
-### PR 2: Database Connection & Types
+### PR 2: System Prompt Builder
+
+**Goal**: Create system prompt with Harel's content
+
+**Changes**:
+
+- Create `lib/system-prompt.ts`
+- Function: `buildSystemPrompt(): string`
+- Include content from:
+  - `content/profile.ts`: bio, highlights, experience, skills
+  - `content/writing.ts`: writing series and featured articles
+  - `content/life.ts`: hobbies/interests
+- Format as readable text with clear sections
+- Include instructions: answer questions about Harel, cite sources when possible (e.g., mention specific articles or experiences), be helpful and concise
+- Structure: Introduction → About → Experience → Skills → Writing → Interests
+
+**Verification**:
+
+- System prompt builds correctly
+- All content sections included
+- Text is readable and well-formatted
+- Instructions are clear
+- Test with sample output
+
+---
+
+### PR 3: Chat API Route
+
+**Goal**: Create chat API endpoint with system prompt
+
+**Changes**:
+
+- Create `app/api/chat/route.ts`
+- Use Vercel AI SDK `streamText` with Vercel AI Gateway
+- Model: `'anthropic/claude-3.5-sonnet'` (no API key needed - uses Vercel OIDC token)
+- Flow:
+  1. Receive user message
+  2. Load system prompt from `buildSystemPrompt()`
+  3. Stream response using `streamText` with system prompt
+- Error handling
+- Note: Authentication handled automatically by Vercel AI Gateway when deployed
+
+**Verification**:
+
+- API endpoint responds
+- Streaming works
+- Responses are relevant to Harel's content
+- Handles errors gracefully
+- Test with various questions
+
+---
+
+### PR 4: Chat UI & Page
+
+**Goal**: Build chat interface and integrate into site
+
+**Changes**:
+
+- Create `app/components/Chat.tsx`
+- Use Vercel AI SDK `useChat` hook
+- Features:
+  - Message list (user/assistant)
+  - Streaming text display
+  - Loading states
+  - Error handling
+  - Input field and send button
+- Match existing design system (Tailwind, dark mode from `app/layout.tsx`)
+- Accessible (keyboard navigation, ARIA labels)
+- Create `app/chat/page.tsx` with Chat component
+- Add SEO metadata
+- Optional: Add link to chat from navigation or homepage
+- Update `progress.md` to mark chatbot as "Now" instead of "Coming soon"
+
+**Verification**:
+
+- Chat UI renders correctly
+- Messages display properly
+- Streaming works smoothly
+- Responsive design
+- Dark mode works
+- Chat page accessible at `/chat`
+- Full flow works: question → answer
+- SEO metadata correct
+- Integration with site design
+
+---
+
+## Future Phase: RAG Enhancement
+
+The following PRs will be implemented in a future phase to add RAG capabilities, enabling more accurate answers with source citations and the ability to answer questions about specific blog posts.
+
+### RAG PR 1: Database Connection & Types
 
 **Goal**: Set up database connection utilities and TypeScript types
 
 **Changes**:
 
 - Create `lib/db.ts` with Postgres connection using `@vercel/postgres`
-- Implement type definitions in `types/embeddings.ts` (file created in PR 1):
+- Implement type definitions in `types/embeddings.ts`:
   - `EmbeddingRow` (database row type)
   - `ChunkMetadata` (metadata structure)
   - `ContentChunk` (processed chunk type)
@@ -60,7 +151,7 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 ---
 
-### PR 3: Database Schema Migration
+### RAG PR 2: Database Schema Migration
 
 **Goal**: Create embeddings table with pgvector support
 
@@ -85,7 +176,7 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 ---
 
-### PR 4: Markdown Content Processor
+### RAG PR 3: Markdown Content Processor
 
 **Goal**: Read and chunk markdown blog posts
 
@@ -107,7 +198,7 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 ---
 
-### PR 5: TypeScript Content Processor
+### RAG PR 4: TypeScript Content Processor
 
 **Goal**: Process TypeScript content files (profile, writing, life)
 
@@ -130,7 +221,7 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 ---
 
-### PR 6: Embedding Generation Utilities
+### RAG PR 5: Embedding Generation Utilities
 
 **Goal**: Generate embeddings using Vercel AI Gateway (no external API keys)
 
@@ -155,7 +246,7 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 ---
 
-### PR 7: Content Indexing Script
+### RAG PR 6: Content Indexing Script
 
 **Goal**: Script to process all content and store embeddings in database
 
@@ -178,7 +269,7 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 ---
 
-### PR 8: Vector Search Utilities
+### RAG PR 7: Vector Search Utilities
 
 **Goal**: Implement vector similarity search using pgvector
 
@@ -199,7 +290,7 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 ---
 
-### PR 9: Context Builder for RAG
+### RAG PR 8: Context Builder for RAG
 
 **Goal**: Format retrieved chunks for LLM prompt with citations
 
@@ -221,16 +312,14 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 
 ---
 
-### PR 10: Chat API Route
+### RAG PR 9: Update Chat API Route for RAG
 
-**Goal**: Create RAG-powered chat API endpoint
+**Goal**: Update chat API to use RAG instead of system prompt
 
 **Changes**:
 
-- Create `app/api/chat/route.ts`
-- Use Vercel AI SDK `streamText` with Vercel AI Gateway
-- Specify model as `'anthropic/claude-3.5-sonnet'` (no API key needed - uses Vercel OIDC token)
-- Flow:
+- Update `app/api/chat/route.ts`
+- Replace system prompt approach with RAG flow:
   1. Receive user message
   2. Generate query embedding using `embed({ model: 'cohere/embed-v4.0', value: query })`
   3. Search for similar chunks (top 3-5)
@@ -238,65 +327,14 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
   5. Stream response with source references
 - System prompt: instruct LLM to cite sources and only answer from provided context
 - Error handling
-- Note: Authentication handled automatically by Vercel AI Gateway when deployed
 
 **Verification**:
 
 - API endpoint responds
 - Streaming works
-- Responses cite sources
+- Responses cite sources accurately
 - Handles errors gracefully
 - Test with various questions
-
----
-
-### PR 11: Chat UI Component
-
-**Goal**: Build chat interface with streaming support
-
-**Changes**:
-
-- Create `app/components/Chat.tsx`
-- Use Vercel AI SDK `useChat` hook
-- Features:
-  - Message list (user/assistant)
-  - Streaming text display
-  - Source citations (links to original content)
-  - Loading states
-  - Error handling
-  - Input field and send button
-- Match existing design system (Tailwind, dark mode)
-- Accessible (keyboard navigation, ARIA labels)
-
-**Verification**:
-
-- Chat UI renders correctly
-- Messages display properly
-- Streaming works smoothly
-- Citations are clickable
-- Responsive design
-- Dark mode works
-
----
-
-### PR 12: Chat Page & Integration
-
-**Goal**: Create chat page and integrate into site
-
-**Changes**:
-
-- Create `app/chat/page.tsx`
-- Simple layout with Chat component
-- Add SEO metadata
-- Optional: Add link to chat from navigation or homepage
-- Update `progress.md` to mark chatbot as "Now" instead of "Coming soon"
-
-**Verification**:
-
-- Chat page accessible at `/chat`
-- Full flow works: question → answer → citations
-- SEO metadata correct
-- Integration with site design
 
 ---
 
@@ -307,7 +345,7 @@ Each PR should include:
 - Manual testing of the specific feature
 - TypeScript compilation passes
 - No linting errors
-- Integration test where applicable (especially PRs 10-12)
+- Integration test where applicable (especially PRs 3-4)
 
 ## Future Enhancements (Out of Scope)
 
@@ -321,11 +359,9 @@ Each PR should include:
 ## Decisions
 
 - **LLM**: Anthropic Claude 3.5 Sonnet via Vercel AI Gateway (no external API keys needed - uses Vercel account OIDC token)
-- **Embedding Model**: Cohere `embed-v4.0` via Vercel AI Gateway (no external API keys needed - uses Vercel account OIDC token)
 - **SDK**: Vercel AI SDK with AI Gateway (standard Vercel approach, supports streaming, no API key management)
 - **Authentication**: Vercel AI Gateway handles auth automatically via OIDC token when deployed; use `vc dev` for local development
-- **Chunk Size**: ~500-800 tokens (preserve semantic meaning)
-- **Retrieval**: Top 3-5 chunks (balance context vs. token usage)
-- **Vector Similarity**: Cosine similarity via pgvector
+- **Approach**: System prompt with static content (MVP) - simpler, faster to ship, good enough for initial use
 - **Streaming**: Yes, for better UX
 - **Conversation History**: No (stateless for MVP)
+- **Future Enhancement**: RAG will be added in a future phase to enable source citations and more accurate answers about specific content

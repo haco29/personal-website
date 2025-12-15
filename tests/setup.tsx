@@ -41,3 +41,6 @@ vi.mock("next/link", () => {
 
   return { default: NextLink };
 });
+
+// Mock scrollIntoView for jsdom (used by Chat component)
+Element.prototype.scrollIntoView = vi.fn();
