@@ -30,7 +30,7 @@ export function ChatWidget() {
             <button
               onClick={() => setIsOpen(false)}
               className="rounded-full p-1 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-950 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
-              aria-label="Close chat"
+              aria-label="Close chat panel"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

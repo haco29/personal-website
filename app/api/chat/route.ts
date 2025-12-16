@@ -6,6 +6,9 @@ import { buildSystemPrompt } from "@/lib/system-prompt";
 // Falls back to ANTHROPIC_API_KEY if OIDC token not available
 export const runtime = "nodejs";
 
+// Limits to prevent abuse
+const MAX_MESSAGES_PER_REQUEST = 10;
+
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
@@ -14,6 +17,11 @@ export async function POST(req: Request) {
       return new Response("Invalid request: messages array required", {
         status: 400,
       });
+    }
+
+    // Limit payload size to prevent abuse
+    if (messages.length > MAX_MESSAGES_PER_REQUEST) {
+      return new Response("Too many messages in request", { status: 400 });
     }
 
     const systemPrompt = buildSystemPrompt();

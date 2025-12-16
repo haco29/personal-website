@@ -144,25 +144,89 @@ Vercel automatically provides:
 - Incur unexpected costs
 - Degrade service for other users
 
+### Attack Scenario Diagram
+
+```mermaid
+sequenceDiagram
+    participant Attacker as Malicious User
+    participant API as /api/chat Route
+    participant Gateway as Vercel AI Gateway
+    participant Claude as Claude API
+    participant Billing as Your Billing
+
+    Note over Attacker,Billing: Attack: Token Exhaustion & Cost Spike
+
+    loop Unlimited Requests
+        Attacker->>API: POST /api/chat (Request 1)
+        API->>Gateway: streamText()
+        Gateway->>Claude: API Call ($0.02-0.05)
+        Claude-->>Gateway: Response
+        Gateway-->>API: Stream
+        API-->>Attacker: Response
+
+        Attacker->>API: POST /api/chat (Request 2)
+        API->>Gateway: streamText()
+        Gateway->>Claude: API Call ($0.02-0.05)
+        Note over Claude,Billing: Costs accumulate...
+
+        Attacker->>API: POST /api/chat (Request N)
+        Note over API: No rate limiting!
+        Note over Gateway: No protection!
+    end
+
+    Claude->>Billing: Bill: $100s - $1000s+
+    Note over Billing: Unexpected charges
+
+    Note over API: Other users blocked
+    Note over Gateway: Token quota exhausted
+```
+
+### Current vs Protected Architecture
+
+```mermaid
+graph TB
+    subgraph Current["Current Implementation (Vulnerable)"]
+        User1[User] -->|Unlimited| API1[Chat API]
+        API1 -->|No Protection| Gateway1[AI Gateway]
+        Gateway1 -->|High Costs| Billing1[Your Billing]
+        Attacker1[Malicious User] -->|Unlimited| API1
+    end
+
+    subgraph Protected["Recommended Implementation"]
+        User2[User] -->|Limited| RateLimit[Rate Limiter]
+        RateLimit -->|10 req/min| API2[Chat API]
+        API2 -->|Validated| Gateway2[AI Gateway]
+        Gateway2 -->|Controlled Costs| Billing2[Your Billing]
+        Attacker2[Malicious User] -->|Blocked| RateLimit
+        RateLimit -->|429 Error| Blocked[Rate Limit Exceeded]
+    end
+
+    style Current fill:#ffe1e1
+    style Protected fill:#e1f5e1
+    style Attacker1 fill:#ffcccc
+    style Attacker2 fill:#ffcccc
+    style Blocked fill:#e1f5e1
+```
+
 ### Recommended Protections
 
 #### 1. Rate Limiting (High Priority)
 
 Implement rate limiting to prevent abuse:
 
-**Option A: Vercel Edge Config + Middleware**
+#### Option A: Vercel Edge Config + Middleware
 
 - Use Vercel's Edge Config for rate limiting
 - Implement IP-based rate limiting
 - Example: 10 requests per minute per IP
 
-**Option B: Upstash Redis (Recommended)**
+#### Option B: Upstash Redis (Recommended)
 
 - Serverless Redis for rate limiting
 - More flexible than Edge Config
 - Better for complex rate limiting rules
 
-**Option C: Vercel Web Application Firewall (WAF)**
+#### Option C: Vercel Web Application Firewall (WAF)
 
 - Built-in protection at the edge
 - Configure rate limiting rules in Vercel dashboard
@@ -201,6 +265,34 @@ Set up alerts for:
 ---
 
 ## Cost Management
+
+### Cost Flow Diagram
+
+```mermaid
+graph LR
+    Request[User Request] -->|System Prompt| InputTokens[Input Tokens ~2,000]
+    Request -->|User Message| InputTokens2[Input Tokens ~100]
+    Request -->|Response| OutputTokens[Output Tokens ~300]
+
+    InputTokens --> CostCalc[Cost Calculation]
+    InputTokens2 --> CostCalc
+    OutputTokens --> CostCalc
+
+    CostCalc -->|$3 per 1M input| InputCost[Input Cost: ~$0.006]
+    CostCalc -->|$15 per 1M output| OutputCost[Output Cost: ~$0.0045]
+
+    InputCost --> TotalCost[Total: ~$0.01-0.05 per chat]
+    OutputCost --> TotalCost
+
+    TotalCost -->|Multiply by Requests| MonthlyCost[Monthly Cost]
+
+    Attacker[Malicious User] -->|1000s requests| TotalCost
+    TotalCost -->|Unlimited| HighCost[Potential: $100s-$1000s]
+
+    style Attacker fill:#ffcccc
+    style HighCost fill:#ffcccc
+    style TotalCost fill:#fff4e1
+```
 
 ### Understanding Costs
 

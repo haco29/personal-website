@@ -44,7 +44,7 @@ export function buildSystemPrompt(): string {
   profile.experience.forEach((exp) => {
     sections.push(`\n${exp.title} at ${exp.company}`);
     sections.push(`${exp.start} - ${exp.end}`);
-    if (exp.bullets.length > 0) {
+    if (exp.bullets && exp.bullets.length > 0) {
       exp.bullets.forEach((bullet) => {
         sections.push(`- ${bullet}`);
       });

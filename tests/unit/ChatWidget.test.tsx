@@ -37,11 +37,8 @@ describe("ChatWidget", () => {
     const openButton = screen.getByRole("button", { name: "Open chat" });
     await user.click(openButton);
 
-    // Find the header close button (not the toggle button)
-    const heading = screen.getByRole("heading", { name: "Chat" });
-    const headerCloseButton = heading.parentElement?.querySelector(
-      'button[aria-label="Close chat"]',
-    ) as HTMLElement;
+    // Find the header close button using distinct aria-label
+    const headerCloseButton = screen.getByRole("button", { name: "Close chat panel" });
     expect(headerCloseButton).toBeInTheDocument();
 
     // Close widget using header button

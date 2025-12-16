@@ -4,6 +4,19 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useEffect, useRef, useState } from "react";
 
+type TextPart = { type: "text"; text: string };
+type MessagePart = TextPart | { type: string; [key: string]: unknown };
+
+function isTextPart(part: MessagePart): part is TextPart {
+  return part.type === "text" && typeof (part as TextPart).text === "string";
+}
+
+// Input limits
+const MAX_INPUT_LENGTH = 100;
+const CHAR_COUNTER_THRESHOLD = 70; // Show counter when input exceeds this
+const CHAR_WARNING_THRESHOLD = 80; // Show orange warning at this length
+const CHAR_DANGER_THRESHOLD = 90; // Show red warning at this length
+
 export function Chat() {
   const [input, setInput] = useState("");
   const { messages, sendMessage, status, error } = useChat({
@@ -53,8 +66,8 @@ export function Chat() {
             {messages.map((message) => {
               const role = message.role === "user" ? "user" : "assistant";
               const textParts = message.parts
-                .filter((part) => part.type === "text")
-                .map((part) => (part as { text: string }).text)
+                .filter(isTextPart)
+                .map((part) => part.text)
                 .join("");
 
               return (
@@ -103,24 +116,42 @@ export function Chat() {
 
       {/* Input Area */}
       <div className="border-t border-black/10 p-6 dark:border-white/15">
-        <form onSubmit={handleSubmit} className="flex gap-3">
-          <input
-            type="text"
-            value={input}
-            onChange={handleInputChange}
-            placeholder="Ask a question about Harel..."
-            disabled={isLoading}
-            className="flex-1 rounded-full border border-black/10 bg-white px-5 py-3 text-sm text-zinc-950 placeholder:text-zinc-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/15 dark:bg-black dark:text-zinc-50 dark:placeholder:text-zinc-400"
-            aria-label="Chat input"
-          />
-          <button
-            type="submit"
-            disabled={isLoading || !input.trim()}
-            className="rounded-full bg-zinc-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
-            aria-label="Send message"
-          >
-            Send
-          </button>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={input}
+              onChange={handleInputChange}
+              placeholder="Ask a question about Harel..."
+              disabled={isLoading}
+              maxLength={MAX_INPUT_LENGTH}
+              className="flex-1 rounded-full border border-black/10 bg-white px-5 py-3 text-sm text-zinc-950 placeholder:text-zinc-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/15 dark:bg-black dark:text-zinc-50 dark:placeholder:text-zinc-400"
+              aria-label="Chat input"
+              aria-describedby="char-counter"
+            />
+            <button
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              className="rounded-full bg-zinc-950 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
+              aria-label="Send message"
+            >
+              Send
+            </button>
+          </div>
+          {input.length > CHAR_COUNTER_THRESHOLD && (
+            <div
+              id="char-counter"
+              className={`px-5 text-right text-xs ${
+                input.length >= CHAR_DANGER_THRESHOLD
+                  ? "text-red-600 dark:text-red-400"
+                  : input.length >= CHAR_WARNING_THRESHOLD
+                    ? "text-orange-600 dark:text-orange-400"
+                    : "text-zinc-500 dark:text-zinc-400"
+              }`}
+            >
+              {input.length} / {MAX_INPUT_LENGTH} characters
+            </div>
+          )}
         </form>
       </div>
     </div>

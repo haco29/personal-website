@@ -15,6 +15,98 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 - **SDK**: Vercel AI SDK with AI Gateway for streaming chat
 - **System Prompt**: Static content compiled from `content/profile.ts`, `content/writing.ts`, and `content/life.ts`
 
+### Architecture Diagram
+
+```mermaid
+graph TB
+    User[User Browser] -->|Click Chat Button| ChatWidget[ChatWidget Component]
+    ChatWidget -->|User Message| ChatAPI[/api/chat Route]
+    ChatAPI -->|Build System Prompt| SystemPrompt[buildSystemPrompt]
+    SystemPrompt -->|Read Content| Profile[content/profile.ts]
+    SystemPrompt -->|Read Content| Writing[content/writing.ts]
+    SystemPrompt -->|Read Content| Life[content/life.ts]
+    ChatAPI -->|Stream Request| VercelAI[Vercel AI Gateway]
+    VercelAI -->|OIDC Token Auth| Anthropic[Anthropic Claude 3.5 Sonnet]
+    Anthropic -->|Stream Response| VercelAI
+    VercelAI -->|Stream Text| ChatAPI
+    ChatAPI -->|Stream UI Messages| ChatWidget
+    ChatWidget -->|Display Messages| User
+
+    style ChatWidget fill:#e1f5e1
+    style ChatAPI fill:#e1f5e1
+    style VercelAI fill:#fff4e1
+    style Anthropic fill:#ffe1e1
+```
+
+### Current Implementation Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant ChatWidget
+    participant ChatAPI
+    participant SystemPrompt
+    participant VercelAI
+    participant Claude
+
+    User->>ChatWidget: Click chat button
+    ChatWidget->>ChatWidget: Open widget popup
+    User->>ChatWidget: Type message & send
+    ChatWidget->>ChatAPI: POST /api/chat {messages}
+    ChatAPI->>SystemPrompt: buildSystemPrompt()
+    SystemPrompt-->>ChatAPI: System prompt string
+    ChatAPI->>VercelAI: streamText(model, system, messages)
+    VercelAI->>VercelAI: Authenticate with OIDC token
+    VercelAI->>Claude: API request with system prompt
+    Claude-->>VercelAI: Stream tokens
+    VercelAI-->>ChatAPI: Stream UI messages
+    ChatAPI-->>ChatWidget: Stream response
+    ChatWidget-->>User: Display streaming text
+```
+
+### Security Vulnerabilities (Current State)
+
+```mermaid
+graph LR
+    Attacker[Malicious User] -->|Unlimited Requests| ChatAPI[/api/chat Route]
+    ChatAPI -->|No Rate Limiting| VercelAI[Vercel AI Gateway]
+    VercelAI -->|Consumes Tokens| Claude[Claude API]
+    Claude -->|High Costs| Billing[Your Billing Account]
+
+    Attacker -.->|Attack Vector| TokenExhaustion[Token Quota Exhausted]
+    Attacker -.->|Attack Vector| CostSpike[Unexpected Costs $100s-$1000s]
+    Attacker -.->|Attack Vector| ServiceDegradation[Other Users Blocked]
+
+    style Attacker fill:#ffcccc
+    style TokenExhaustion fill:#ffcccc
+    style CostSpike fill:#ffcccc
+    style ServiceDegradation fill:#ffcccc
+    style ChatAPI fill:#ffe1e1
+```
+
+### Recommended Security Architecture
+
+```mermaid
+graph TB
+    User[User Browser] -->|Request| RateLimiter[Rate Limiter]
+    RateLimiter -->|Check IP/User| Redis[(Upstash Redis)]
+    RateLimiter -->|Rate Limit OK?| Decision{Allowed?}
+    Decision -->|No| Blocked[429 Rate Limit Exceeded]
+    Decision -->|Yes| ChatAPI[/api/chat Route]
+    ChatAPI -->|Validate Input| Validator[Input Validator]
+    Validator -->|Valid?| Decision2{Valid?}
+    Decision2 -->|No| Error[400 Bad Request]
+    Decision2 -->|Yes| VercelAI[Vercel AI Gateway]
+    VercelAI -->|Monitor Usage| Monitoring[Usage Monitoring]
+    Monitoring -->|Alert Threshold| Alerts[Cost Alerts]
+
+    style RateLimiter fill:#e1f5e1
+    style Validator fill:#e1f5e1
+    style Monitoring fill:#e1f5e1
+    style Blocked fill:#ffcccc
+    style Error fill:#ffcccc
+```
+
 ## Implementation PRs
 
 ### PR 1: Project Setup & Dependencies
