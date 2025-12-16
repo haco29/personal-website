@@ -446,7 +446,6 @@ Each PR should include:
 - Fine-tuned chunking strategies
 - Analytics on queries
 - Admin panel for re-indexing
-- Rate limiting for API
 
 ## Decisions
 
@@ -457,3 +456,17 @@ Each PR should include:
 - **Streaming**: Yes, for better UX
 - **Conversation History**: No (stateless for MVP)
 - **Future Enhancement**: RAG will be added in a future phase to enable source citations and more accurate answers about specific content
+
+## Security (MVP Constraints)
+
+**Known Gaps**: Current MVP lacks rate limiting and usage monitoring.  
+**Planned**: Rate limiting and monitoring will be added in a follow-up PR (estimated: PR 5).  
+**Risk**: Until implemented, the chat API is vulnerable to abuse leading to unexpected costs. Input validation (message count and length limits) is implemented in PR 3 to provide basic protection.
+
+**Security Roadmap**:
+
+- ✅ **PR 3 (Implemented)**: Basic input validation (message count limit, per-message length validation)
+- ⏳ **PR 5 (Planned)**: Rate limiting with Upstash Redis to prevent abuse
+- ⏳ **PR 5 (Planned)**: Usage monitoring and cost alerts
+
+**Note**: The security diagrams above (lines 67-108) illustrate the recommended architecture. Rate limiting is a critical mitigation but is deferred to a follow-up PR to enable faster MVP delivery. The current implementation includes basic input validation to reduce token consumption from individual requests.
