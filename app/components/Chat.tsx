@@ -17,7 +17,11 @@ const CHAR_COUNTER_THRESHOLD = 70; // Show counter when input exceeds this
 const CHAR_WARNING_THRESHOLD = 80; // Show orange warning at this length
 const CHAR_DANGER_THRESHOLD = 90; // Show red warning at this length
 
-export function Chat() {
+interface ChatProps {
+  inputRef?: (element: HTMLInputElement | null) => void;
+}
+
+export function Chat({ inputRef }: ChatProps) {
   const [input, setInput] = useState("");
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
@@ -26,11 +30,18 @@ export function Chat() {
   });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const internalInputRef = useRef<HTMLInputElement | null>(null);
   const isLoading = status === "streaming" || status === "submitted";
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Callback ref that combines external ref callback with internal ref
+  const handleInputRef = (element: HTMLInputElement | null) => {
+    internalInputRef.current = element;
+    inputRef?.(element);
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -119,6 +130,7 @@ export function Chat() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-2">
           <div className="flex gap-3">
             <input
+              ref={handleInputRef}
               type="text"
               value={input}
               onChange={handleInputChange}

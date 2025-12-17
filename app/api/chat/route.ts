@@ -11,7 +11,6 @@ export const runtime = "nodejs";
 
 // Limits to prevent abuse
 const MAX_MESSAGES_PER_REQUEST = 10;
-const MAX_MESSAGE_LENGTH = 1000; // characters per message
 
 export async function POST(req: Request) {
   try {
@@ -26,15 +25,6 @@ export async function POST(req: Request) {
     // Limit payload size to prevent abuse
     if (messages.length > MAX_MESSAGES_PER_REQUEST) {
       return new Response("Too many messages in request", { status: 400 });
-    }
-
-    // Validate individual message lengths
-    for (const msg of messages) {
-      const content =
-        msg.content || msg.parts?.map((p: { text?: string }) => p.text || "").join("") || "";
-      if (content.length > MAX_MESSAGE_LENGTH) {
-        return new Response("Message content too long", { status: 400 });
-      }
     }
 
     const systemPrompt = buildSystemPrompt();

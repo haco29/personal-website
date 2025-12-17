@@ -19,11 +19,26 @@ export function ChatWidget() {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen]);
 
+  // Callback ref to focus input when it mounts (only when chat is open)
+  const handleInputRef: (element: HTMLInputElement | null) => void = (element) => {
+    if (element && isOpen) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        element.focus();
+      });
+    }
+  };
+
   return (
     <div className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-4">
       {/* Chat Widget */}
       {isOpen && (
-        <div className="flex h-[600px] w-[400px] flex-col rounded-2xl border border-black/10 bg-white shadow-2xl transition-all sm:w-[380px] dark:border-white/15 dark:bg-black">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Chat with Harel"
+          className="flex h-[600px] w-[400px] flex-col rounded-2xl border border-black/10 bg-white shadow-2xl transition-all sm:w-[380px] dark:border-white/15 dark:bg-black"
+        >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-black/10 px-6 py-4 dark:border-white/15">
             <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">Chat</h2>
@@ -47,7 +62,7 @@ export function ChatWidget() {
 
           {/* Chat Component */}
           <div className="flex-1 overflow-hidden">
-            <Chat />
+            <Chat inputRef={handleInputRef} />
           </div>
         </div>
       )}
