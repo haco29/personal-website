@@ -95,7 +95,6 @@ When this command is run:
    ````
 
 4. **Focus on:**
-
    - **Next.js & TypeScript:**
      - Missing type definitions or using `any`
      - Incorrect App Router patterns (server vs client components)

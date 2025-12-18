@@ -5,7 +5,7 @@ import { ChatWidget } from "../../app/components/ChatWidget";
 
 // Mock the Chat component to avoid API calls in unit tests
 vi.mock("../../app/components/Chat", () => ({
-  Chat: () => <div data-testid="chat-component">Chat Component</div>,
+  Chat: () => <div>Chat Component</div>,
 }));
 
 describe("ChatWidget", () => {
@@ -22,7 +22,7 @@ describe("ChatWidget", () => {
 
     // Chat widget should be visible
     expect(screen.getByRole("heading", { name: "Chat" })).toBeInTheDocument();
-    expect(screen.getByTestId("chat-component")).toBeInTheDocument();
+    expect(screen.getByText("Chat Component")).toBeInTheDocument();
 
     // Toggle button label should change to "Close chat"
     const toggleButtons = screen.getAllByRole("button", { name: "Close chat" });
@@ -46,7 +46,7 @@ describe("ChatWidget", () => {
 
     // Widget should be closed
     expect(screen.queryByRole("heading", { name: "Chat" })).not.toBeInTheDocument();
-    expect(screen.queryByTestId("chat-component")).not.toBeInTheDocument();
+    expect(screen.queryByText("Chat Component")).not.toBeInTheDocument();
 
     // Button should be back to "Open chat"
     expect(screen.getByRole("button", { name: "Open chat" })).toBeInTheDocument();

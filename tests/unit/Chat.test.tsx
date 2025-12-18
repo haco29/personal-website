@@ -134,4 +134,26 @@ describe("Chat", () => {
     expect(input).toBeDisabled();
     expect(sendButton).toBeDisabled();
   });
+
+  it("renders markdown content in assistant messages", () => {
+    mockMessages.push({
+      id: "1",
+      role: "assistant",
+      parts: [
+        {
+          type: "text",
+          text: "**Bold text** and [a link](https://example.com)",
+        },
+      ],
+    });
+
+    render(<Chat />);
+
+    // Verify markdown is rendered (not raw markdown syntax)
+    expect(screen.getByText("Bold text")).toBeInTheDocument();
+    const link = screen.getByRole("link", { name: "a link" });
+    expect(link).toHaveAttribute("href", "https://example.com");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  });
 });
