@@ -8,17 +8,42 @@ globs:
 
 ## Conditional ARIA Attributes
 
-**Problem**: `aria-describedby` references elements that may not exist, creating invalid ARIA references.
+**Problem**: ARIA attributes reference elements that may not exist, creating invalid ARIA references.
 
-**Solution**: Conditionally set ARIA attributes only when referenced elements are rendered.
+**Solution**: Conditionally set ARIA attributes only when referenced elements are rendered or when state changes.
 
 ```tsx
-// ❌ Bad - always references element that may not exist
-<input
-  aria-label="Chat input"
-  aria-describedby="char-counter"
-/>
+// ❌ Bad - aria-expanded doesn't reflect actual state
+function ChatWidget({ isOpen }: { isOpen: boolean }) {
+  return (
+    <button>Chat</button>
+  );
+}
 
+// ✅ Good - set aria-expanded based on component visibility state
+function ChatWidget({ isOpen }: { isOpen: boolean }) {
+  return (
+    <div>
+      <button
+        aria-expanded={isOpen}
+        aria-controls="chat-panel"
+        aria-label={isOpen ? "Close chat" : "Open chat"}
+      >
+        Chat
+      </button>
+      {isOpen && (
+        <div id="chat-panel" role="dialog" aria-modal="true">
+          {/* chat content */}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+**Also applies to**: `aria-describedby` - only set when the referenced element exists.
+
+```tsx
 // ✅ Good - only set when element exists
 <input
   aria-label="Chat input"
@@ -42,3 +67,53 @@ expect(screen.getByRole("button", { name: "Close chat" })).toBeInTheDocument();
 ## Keyboard Navigation
 
 Always test keyboard interactions (Escape key, Tab navigation) for interactive components like modals, dropdowns, and widgets.
+
+### Example: Close Modal on Escape
+
+```tsx
+// Component
+export function ChatWidget() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [isOpen]);
+
+  return (
+    <>
+      <button onClick={() => setIsOpen(!isOpen)}>
+        {isOpen ? "Close chat" : "Open chat"}
+      </button>
+      {isOpen && (
+        <div role="dialog" aria-modal="true" aria-labelledby="widget-title">
+          <h2 id="widget-title">Chat</h2>
+          {/* widget content */}
+        </div>
+      )}
+    </>
+  );
+}
+
+// Test
+it("closes when Escape key is pressed", async () => {
+  const user = userEvent.setup();
+  render(<ChatWidget />);
+  
+  const openButton = screen.getByRole("button", { name: "Open chat" });
+  
+  await user.click(openButton);
+  expect(screen.getByRole("dialog")).toBeInTheDocument();
+  
+  await user.keyboard("{Escape}");
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+});
+```

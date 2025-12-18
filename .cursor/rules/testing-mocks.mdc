@@ -8,24 +8,29 @@ globs:
 
 ## Component Mock Props
 
+**When to use**: Primarily for mocking framework boundaries (`next/link`, `next/image`) or third-party components. Only mock your own components when testing parent components in isolation and you have a strong reason to avoid integration-level testing.
+
 **Problem**: Mocks ignore props that components expect, making mocks inaccurate.
 
 **Solution**: Accept all props in mocks, even if unused. Use `eslint-disable` for intentionally unused parameters.
 
 ```tsx
 // ❌ Bad - ignores props component expects
-vi.mock("../../app/components/Chat", () => ({
-  Chat: () => <div>Chat Component</div>,
+vi.mock("@ai-sdk/react", () => ({
+  useChat: () => ({ messages: [] }),
 }));
 
 // ✅ Good - accepts props, marks unused as intentional
-vi.mock("../../app/components/Chat", () => ({
+vi.mock("@ai-sdk/react", () => ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Chat: ({ inputRef }: { inputRef?: (el: HTMLInputElement | null) => void }) => (
-    <div>Chat Component</div>
-  ),
+  useChat: ({ maxSteps }: { maxSteps?: number }) => ({ 
+    messages: [],
+    sendMessage: vi.fn(),
+  }),
 }));
 ```
+
+**Note**: When mocking your own components (e.g., `Chat` when testing `ChatWidget`), ensure you have a strong reason (like avoiding API calls) and accept all props the component expects.
 
 ## Complete Module Mocks
 
@@ -52,6 +57,32 @@ vi.mock("@ai-sdk/react", () => ({
 
 ```tsx
 // ✅ Good - tests both open and close via toggle button
-it("opens widget when toggle clicked", async () => { /* ... */ });
-it("closes widget when toggle clicked while open", async () => { /* ... */ });
+it("opens widget when toggle clicked", async () => {
+  const user = userEvent.setup();
+  render(<ChatWidget />);
+  
+  const toggleButton = screen.getByRole("button", { name: "Open chat" });
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  
+  await user.click(toggleButton);
+  
+  expect(screen.getByRole("dialog")).toBeInTheDocument();
+});
+
+it("closes widget when toggle clicked while open", async () => {
+  const user = userEvent.setup();
+  render(<ChatWidget />);
+  
+  const toggleButton = screen.getByRole("button", { name: "Open chat" });
+  
+  // Open widget
+  await user.click(toggleButton);
+  expect(screen.getByRole("dialog")).toBeInTheDocument();
+  
+  // Close widget via same toggle button
+  const closeButton = screen.getByRole("button", { name: "Close chat" });
+  await user.click(closeButton);
+  
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+});
 ```
