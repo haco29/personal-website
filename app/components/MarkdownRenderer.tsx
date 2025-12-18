@@ -1,6 +1,8 @@
 "use client";
 
+import React from "react";
 import ReactMarkdown from "react-markdown";
+import { createContext, useContext } from "react";
 
 interface MarkdownRendererProps {
   content: string;
@@ -21,6 +23,32 @@ const MARKDOWN_STYLES = {
     "my-2 border-l-4 border-zinc-300 pl-4 text-zinc-700 italic dark:border-zinc-600 dark:text-zinc-300",
   hr: "my-4 border-zinc-200 dark:border-zinc-700",
 } as const;
+
+// Context to track if we're inside a <pre> element (fenced code block)
+const PreContext = createContext(false);
+
+// Wrapper component for code that can use hooks
+function CodeComponent({
+  className,
+  children,
+  ...props
+}: {
+  className?: string | null;
+  children: React.ReactNode;
+  [key: string]: unknown;
+}) {
+  const isInsidePre = useContext(PreContext);
+  // Fenced code blocks are wrapped in <pre>, inline code is not
+  // className may be present for language-tagged blocks, but fenced blocks without language
+  // also get wrapped in <pre>, so we check the context
+  const isBlock = isInsidePre || (className !== undefined && className !== null);
+  const isInline = !isBlock;
+  return (
+    <code className={isInline ? MARKDOWN_STYLES.codeInline : MARKDOWN_STYLES.codeBlock} {...props}>
+      {children}
+    </code>
+  );
+}
 
 export function MarkdownRenderer({ content, className = "" }: MarkdownRendererProps) {
   return (
@@ -62,18 +90,18 @@ export function MarkdownRenderer({ content, className = "" }: MarkdownRendererPr
           ),
           li: ({ ...props }) => <li className={MARKDOWN_STYLES.textSmall} {...props} />,
           // Code blocks
-          code: ({ className, children, ...props }) => {
-            const isInline = !className;
-            return (
-              <code
-                className={isInline ? MARKDOWN_STYLES.codeInline : MARKDOWN_STYLES.codeBlock}
-                {...props}
-              >
+          code: ({ className, children, ...props }) => (
+            <CodeComponent className={className} {...props}>
+              {children}
+            </CodeComponent>
+          ),
+          pre: ({ children, ...props }) => (
+            <PreContext.Provider value={true}>
+              <pre className="mb-2 overflow-x-auto" {...props}>
                 {children}
-              </code>
-            );
-          },
-          pre: ({ ...props }) => <pre className="mb-2 overflow-x-auto" {...props} />,
+              </pre>
+            </PreContext.Provider>
+          ),
           // Links
           a: ({ ...props }) => (
             <a

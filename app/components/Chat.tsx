@@ -18,6 +18,11 @@ const CHAR_COUNTER_THRESHOLD = 70; // Show counter when input exceeds this
 const CHAR_WARNING_THRESHOLD = 80; // Show orange warning at this length
 const CHAR_DANGER_THRESHOLD = 90; // Show red warning at this length
 
+// Transport instance created once outside component to avoid re-initialization on each render
+const chatTransport = new DefaultChatTransport({
+  api: "/api/chat",
+});
+
 interface ChatProps {
   inputRef?: (element: HTMLInputElement | null) => void;
 }
@@ -25,14 +30,13 @@ interface ChatProps {
 export function Chat({ inputRef }: ChatProps) {
   const [input, setInput] = useState("");
   const { messages, sendMessage, status, error } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/chat",
-    }),
+    transport: chatTransport,
   });
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const internalInputRef = useRef<HTMLInputElement | null>(null);
   const isLoading = status === "streaming" || status === "submitted";
+  const isWaitingForResponse = status === "submitted"; // Only show loading indicator before streaming starts
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -103,13 +107,19 @@ export function Chat({ inputRef }: ChatProps) {
                 </div>
               );
             })}
-            {isLoading && (
+            {isWaitingForResponse && (
               <div className="flex justify-start">
                 <div className="rounded-2xl border border-black/10 bg-white px-4 py-3 dark:border-white/15 dark:bg-black">
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-2 animate-pulse rounded-full bg-zinc-400"></div>
-                    <div className="h-2 w-2 animate-pulse rounded-full bg-zinc-400 delay-75"></div>
-                    <div className="h-2 w-2 animate-pulse rounded-full bg-zinc-400 delay-150"></div>
+                    <div
+                      className="h-2 w-2 animate-pulse rounded-full bg-zinc-400"
+                      style={{ animationDelay: "150ms" }}
+                    ></div>
+                    <div
+                      className="h-2 w-2 animate-pulse rounded-full bg-zinc-400"
+                      style={{ animationDelay: "300ms" }}
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -144,7 +154,7 @@ export function Chat({ inputRef }: ChatProps) {
               maxLength={MAX_INPUT_LENGTH}
               className="flex-1 rounded-full border border-black/10 bg-white px-5 py-3 text-sm text-zinc-950 placeholder:text-zinc-500 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/15 dark:bg-black dark:text-zinc-50 dark:placeholder:text-zinc-400"
               aria-label="Chat input"
-              aria-describedby="char-counter"
+              aria-describedby={input.length > CHAR_COUNTER_THRESHOLD ? "char-counter" : undefined}
             />
             <button
               type="submit"

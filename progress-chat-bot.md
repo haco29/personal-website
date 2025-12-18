@@ -4,6 +4,27 @@ This file tracks the implementation of the chatbot feature, broken down into sma
 
 📖 **See also**: [Chatbot Operations Guide](./docs/chatbot-operations.md) for local/production setup, security, cost management, and monitoring.
 
+## Status Summary
+
+**MVP Status**: ✅ **COMPLETED** (PRs 1-4)
+
+The chatbot MVP is fully implemented and deployed:
+
+- ✅ System prompt builder with Harel's content
+- ✅ Chat API route with streaming support
+- ✅ Chat widget UI (floating button, modal dialog)
+- ✅ Markdown rendering for assistant messages
+- ✅ Input validation and character limits
+- ✅ Comprehensive test coverage (14 unit + 2 integration tests)
+- ✅ Accessible design (keyboard navigation, ARIA labels)
+- ✅ Dark mode support
+- ✅ Integrated site-wide via `app/layout.tsx`
+
+**Next Steps**:
+
+- ⏳ Rate limiting and usage monitoring (PR 5)
+- ⏳ RAG enhancement for source citations (Future Phase)
+
 ## Goal
 
 A chatbot that answers questions about Harel's content (talks, writing, projects) using a system prompt with static content. This MVP approach provides a fast path to shipping, with RAG (Retrieval-Augmented Generation) planned for a future phase to enable more accurate answers with source citations.
@@ -109,110 +130,142 @@ graph TB
 
 ## Implementation PRs
 
-### PR 1: Project Setup & Dependencies
+### ✅ PR 1: Project Setup & Dependencies
+
+**Status**: ✅ **COMPLETED**
 
 **Goal**: Verify dependencies and set up project structure
 
 **Changes**:
 
-- Verify `ai` SDK is already installed (already in `package.json`)
-- No database dependencies needed for MVP
-- Create folder structure: `lib/` (if needed)
-- Note: No external API keys needed - Vercel AI Gateway uses OIDC token from Vercel account
-- For local dev: use `vc dev` or `vc env pull` to get OIDC token
+- ✅ Verified `ai` SDK and `@ai-sdk/react` are installed (`package.json`)
+- ✅ Added `react-markdown` for markdown rendering
+- ✅ Created folder structure: `lib/` exists
+- ✅ Note: No external API keys needed - Vercel AI Gateway uses OIDC token from Vercel account
+- ✅ For local dev: use `vc dev` or `vc env pull` to get OIDC token
+- ✅ Added `dev:vercel` script for local development with Vercel CLI
 
 **Verification**:
 
-- `pnpm install` succeeds
-- No TypeScript errors
-- Folder structure exists
+- ✅ `pnpm install` succeeds
+- ✅ No TypeScript errors
+- ✅ Folder structure exists
 
 ---
 
-### PR 2: System Prompt Builder
+### ✅ PR 2: System Prompt Builder
+
+**Status**: ✅ **COMPLETED**
 
 **Goal**: Create system prompt with Harel's content
 
 **Changes**:
 
-- Create `lib/system-prompt.ts`
-- Function: `buildSystemPrompt(): string`
-- Include content from:
-  - `content/profile.ts`: bio, highlights, experience, skills
+- ✅ Created `lib/system-prompt.ts`
+- ✅ Function: `buildSystemPrompt(): string`
+- ✅ Includes content from:
+  - `content/profile.ts`: bio, highlights, experience, skills, education
   - `content/writing.ts`: writing series and featured articles
-  - `content/life.ts`: hobbies/interests
-- Format as readable text with clear sections
-- Include instructions: answer questions about Harel, cite sources when possible (e.g., mention specific articles or experiences), be helpful and concise
-- Structure: Introduction → About → Experience → Skills → Writing → Interests
+  - `content/life.ts`: hobbies/interests, family
+- ✅ Formatted as readable text with clear sections
+- ✅ Includes instructions: answer questions about Harel, cite sources when possible (e.g., mention specific articles or experiences), be helpful and concise
+- ✅ Structure: Introduction → About → Experience → Skills → Education → Writing → Interests → Links
+- ✅ Uses array-based approach (`sections.push()`) for cleaner code
 
 **Verification**:
 
-- System prompt builds correctly
-- All content sections included
-- Text is readable and well-formatted
-- Instructions are clear
-- Test with sample output
+- ✅ System prompt builds correctly
+- ✅ All content sections included
+- ✅ Text is readable and well-formatted
+- ✅ Instructions are clear
 
 ---
 
-### PR 3: Chat API Route
+### ✅ PR 3: Chat API Route
+
+**Status**: ✅ **COMPLETED**
 
 **Goal**: Create chat API endpoint with system prompt
 
 **Changes**:
 
-- Create `app/api/chat/route.ts`
-- Use Vercel AI SDK `streamText` with Vercel AI Gateway
-- Model: `'anthropic/claude-3.5-sonnet'` (no API key needed - uses Vercel OIDC token)
-- Flow:
+- ✅ Created `app/api/chat/route.ts`
+- ✅ Uses Vercel AI SDK `streamText` with Vercel AI Gateway
+- ✅ Model: `'anthropic/claude-3.5-sonnet'` (no API key needed - uses Vercel OIDC token)
+- ✅ Flow:
   1. Receive user message
-  2. Load system prompt from `buildSystemPrompt()`
-  3. Stream response using `streamText` with system prompt
-- Error handling
-- Note: Authentication handled automatically by Vercel AI Gateway when deployed
+  2. Validate messages array and limit payload size (`MAX_MESSAGES_PER_REQUEST = 10`)
+  3. Load system prompt from `buildSystemPrompt()`
+  4. Convert messages using `convertToCoreMessages()`
+  5. Stream response using `streamText` with system prompt
+  6. Return `toUIMessageStreamResponse()` for DefaultChatTransport compatibility
+- ✅ Error handling with helpful auth error messages
+- ✅ Input validation: message count limit, array validation
+- ✅ Runtime: `nodejs` for proper `.env.local` reading
+- ✅ Note: Authentication handled automatically by Vercel AI Gateway when deployed
 
 **Verification**:
 
-- API endpoint responds
-- Streaming works
-- Responses are relevant to Harel's content
-- Handles errors gracefully
-- Test with various questions
+- ✅ API endpoint responds
+- ✅ Streaming works
+- ✅ Responses are relevant to Harel's content
+- ✅ Handles errors gracefully
+- ✅ Input validation prevents abuse
 
 ---
 
-### PR 4: Chat UI & Page
+### ✅ PR 4: Chat UI & Widget
+
+**Status**: ✅ **COMPLETED**
 
 **Goal**: Build chat interface and integrate into site
 
 **Changes**:
 
-- Create `app/components/Chat.tsx`
-- Use Vercel AI SDK `useChat` hook
-- Features:
-  - Message list (user/assistant)
-  - Streaming text display
-  - Loading states
-  - Error handling
-  - Input field and send button
-- Match existing design system (Tailwind, dark mode from `app/layout.tsx`)
-- Accessible (keyboard navigation, ARIA labels)
-- Create `app/chat/page.tsx` with Chat component
-- Add SEO metadata
-- Optional: Add link to chat from navigation or homepage
-- Update `progress.md` to mark chatbot as "Now" instead of "Coming soon"
+- ✅ Created `app/components/Chat.tsx`
+- ✅ Uses Vercel AI SDK `useChat` hook with `DefaultChatTransport`
+- ✅ Features:
+  - ✅ Message list (user/assistant) with proper styling
+  - ✅ Streaming text display
+  - ✅ Loading states with animated dots
+  - ✅ Error handling with user-friendly messages
+  - ✅ Input field with character limit (100 chars) and visual feedback
+  - ✅ Character counter with color-coded warnings (70/80/90 thresholds)
+  - ✅ Send button with proper disabled states
+  - ✅ Empty state message
+  - ✅ Auto-scroll to latest message
+  - ✅ Callback ref support for focus management
+- ✅ Created `app/components/MarkdownRenderer.tsx` for assistant message formatting
+  - ✅ Supports headings, paragraphs, lists, code blocks, links, bold, italic, blockquotes
+  - ✅ Dark mode support
+  - ✅ Extracted styles to constants for maintainability
+- ✅ Created `app/components/ChatWidget.tsx` (floating widget, not separate page)
+  - ✅ Floating button in bottom-right corner
+  - ✅ Modal dialog with header and close button
+  - ✅ Keyboard support (Escape to close)
+  - ✅ Focus management (auto-focus input when opened)
+  - ✅ Accessible (ARIA labels, roles, keyboard navigation)
+- ✅ Integrated into `app/layout.tsx` (available site-wide)
+- ✅ Matches existing design system (Tailwind, dark mode)
+- ✅ Responsive design (mobile-friendly widget sizing)
+- ✅ Added tests: `tests/unit/Chat.test.tsx` and `tests/unit/ChatWidget.test.tsx`
+  - ✅ Tests user-observable behavior
+  - ✅ Uses semantic queries (no `data-testid` except where necessary)
+  - ✅ Tests markdown rendering
+- ✅ Updated `progress.md` to mark chatbot as "Now" instead of "Coming soon"
 
 **Verification**:
 
-- Chat UI renders correctly
-- Messages display properly
-- Streaming works smoothly
-- Responsive design
-- Dark mode works
-- Chat page accessible at `/chat`
-- Full flow works: question → answer
-- SEO metadata correct
-- Integration with site design
+- ✅ Chat UI renders correctly
+- ✅ Messages display properly
+- ✅ Streaming works smoothly
+- ✅ Responsive design
+- ✅ Dark mode works
+- ✅ Widget accessible site-wide (bottom-right corner)
+- ✅ Full flow works: question → answer
+- ✅ Markdown formatting renders correctly
+- ✅ Integration with site design
+- ✅ All tests pass (14 unit tests)
 
 ---
 
@@ -432,12 +485,26 @@ The following PRs will be implemented in a future phase to add RAG capabilities,
 
 ## Testing Strategy
 
-Each PR should include:
+**Status**: ✅ **COMPLETED** for MVP PRs
 
-- Manual testing of the specific feature
-- TypeScript compilation passes
-- No linting errors
-- Integration test where applicable (especially PRs 3-4)
+**Implemented**:
+
+- ✅ Unit tests for `Chat` component (`tests/unit/Chat.test.tsx`)
+  - Empty state, input/send button, form submission, message display, error handling, loading states, markdown rendering
+- ✅ Unit tests for `ChatWidget` component (`tests/unit/ChatWidget.test.tsx`)
+  - Widget toggle, close button, Escape key handling
+- ✅ Integration tests for pages (`tests/integration/`)
+- ✅ Test setup with proper mocks (`tests/setup.tsx`)
+  - Mocked `next/link`, `next/image`, `scrollIntoView`
+- ✅ All tests use semantic queries (RTL best practices)
+- ✅ Tests focus on user-observable behavior
+
+**Verification**:
+
+- ✅ All tests pass (14 unit tests + 2 integration tests)
+- ✅ TypeScript compilation passes (`pnpm typecheck`)
+- ✅ No linting errors (`pnpm lint`)
+- ✅ Code formatting passes (`pnpm format:check`)
 
 ## Future Enhancements (Out of Scope)
 
@@ -459,13 +526,15 @@ Each PR should include:
 
 ## Security (MVP Constraints)
 
-**Known Gaps**: Current MVP lacks rate limiting and usage monitoring.  
-**Planned**: Rate limiting and monitoring will be added in a follow-up PR (estimated: PR 5).  
-**Risk**: Until implemented, the chat API is vulnerable to abuse leading to unexpected costs. Input validation (message count and length limits) is implemented in PR 3 to provide basic protection.
+**Current State**: Basic input validation implemented. Rate limiting and usage monitoring planned for follow-up.  
+**Risk**: Until rate limiting is implemented, the chat API is vulnerable to abuse leading to unexpected costs. Input validation provides basic protection.
 
 **Security Roadmap**:
 
-- ✅ **PR 3 (Implemented)**: Basic input validation (message count limit, per-message length validation)
+- ✅ **PR 3 (Completed)**: Basic input validation
+  - ✅ Message count limit (`MAX_MESSAGES_PER_REQUEST = 10`)
+  - ✅ Per-message length validation (100 character limit in UI)
+  - ✅ Array validation for messages payload
 - ⏳ **PR 5 (Planned)**: Rate limiting with Upstash Redis to prevent abuse
 - ⏳ **PR 5 (Planned)**: Usage monitoring and cost alerts
 

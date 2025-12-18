@@ -21,6 +21,7 @@ vi.mock("@ai-sdk/react", () => ({
     status: mockStatus,
     error: mockError,
   }),
+  DefaultChatTransport: vi.fn(),
 }));
 
 describe("Chat", () => {
