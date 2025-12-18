@@ -71,3 +71,15 @@ Before adding a new test, ask:
 - Does it cover a **real regression** we care about?
 - Will it survive a refactor (same behavior, different markup)?
 - Could we cover the same risk with a single higher-level test?
+
+## Mock Best Practices
+
+When mocking components or modules:
+
+- Accept all props that components expect (use `eslint-disable` for intentionally unused params).
+- Export all symbols from mocked modules that components import.
+- Test both directions of toggle functionality (open and close) for dual-purpose buttons.
+
+## Assertion Specificity
+
+Prefer `getByRole` over `getAllByRole` + length checks for more specific assertions that catch unexpected behavior.

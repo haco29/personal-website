@@ -1,0 +1,74 @@
+---
+description: React component patterns and best practices for performance and correctness
+globs:
+  - "**/*.{tsx,jsx}"
+---
+
+# React Component Patterns
+
+## Transport/Client Instances
+
+**Problem**: Creating transport instances inside component bodies causes re-initialization on every render.
+
+**Solution**: Create instances outside the component or use `useMemo` for expensive objects.
+
+```tsx
+// ❌ Bad - creates new instance on every render
+export function Chat() {
+  const { messages } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
+  });
+}
+
+// ✅ Good - instance created once
+const chatTransport = new DefaultChatTransport({ api: "/api/chat" });
+
+export function Chat() {
+  const { messages } = useChat({ transport: chatTransport });
+}
+```
+
+## Loading States
+
+**Problem**: Showing loading indicators during streaming can be visually redundant.
+
+**Solution**: Only show loading indicators before streaming starts, not during streaming.
+
+```tsx
+// ❌ Bad - shows loading during streaming
+const isLoading = status === "streaming" || status === "submitted";
+{isLoading && <LoadingIndicator />}
+
+// ✅ Good - only shows before streaming
+const isWaitingForResponse = status === "submitted";
+{isWaitingForResponse && <LoadingIndicator />}
+```
+
+## Animation Delays
+
+**Problem**: Tailwind's `delay-*` utilities are for transitions, not animations.
+
+**Solution**: Use inline `style={{ animationDelay }}` for animation timing.
+
+```tsx
+// ❌ Bad - delay-* doesn't affect animate-pulse
+<div className="animate-pulse delay-75"></div>
+
+// ✅ Good - inline style for animation delay
+<div className="animate-pulse" style={{ animationDelay: "150ms" }}></div>
+```
+
+## Focus Management
+
+**Prefer callback refs over useEffect** for DOM operations like focus management.
+
+```tsx
+// ✅ Good - callback ref pattern
+const handleInputRef = (element: HTMLInputElement | null) => {
+  if (element && isOpen) {
+    requestAnimationFrame(() => {
+      element.focus();
+    });
+  }
+};
+```

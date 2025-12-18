@@ -1,0 +1,44 @@
+---
+description: Accessibility patterns and ARIA best practices
+globs:
+  - "**/*.{tsx,jsx}"
+---
+
+# Accessibility Patterns
+
+## Conditional ARIA Attributes
+
+**Problem**: `aria-describedby` references elements that may not exist, creating invalid ARIA references.
+
+**Solution**: Conditionally set ARIA attributes only when referenced elements are rendered.
+
+```tsx
+// ❌ Bad - always references element that may not exist
+<input
+  aria-label="Chat input"
+  aria-describedby="char-counter"
+/>
+
+// ✅ Good - only set when element exists
+<input
+  aria-label="Chat input"
+  aria-describedby={input.length > THRESHOLD ? "char-counter" : undefined}
+/>
+```
+
+## Semantic Queries in Tests
+
+**Prefer `getByRole` over `getAllByRole` + length checks** for more specific assertions.
+
+```tsx
+// ❌ Bad - less specific, doesn't catch multiple matches
+const buttons = screen.getAllByRole("button", { name: "Close chat" });
+expect(buttons.length).toBeGreaterThan(0);
+
+// ✅ Good - fails if 0 or multiple buttons exist
+expect(screen.getByRole("button", { name: "Close chat" })).toBeInTheDocument();
+```
+
+## Keyboard Navigation
+
+Always test keyboard interactions (Escape key, Tab navigation) for interactive components like modals, dropdowns, and widgets.
