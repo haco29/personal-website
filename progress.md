@@ -4,8 +4,9 @@ This file tracks what `harelcoman.dev` is today and where it’s going next.
 
 ## Now (current)
 
-- **Personal hub**: a clean “Coming soon” homepage with links and contact.
+- **Personal hub**: a clean "Coming soon" homepage with links and contact.
 - **SEO baseline**: robots.txt, sitemap, JSON‑LD, and social preview images.
+- **Harel chatbot**: a chatbot that answers questions about Harel's content (experience, skills, writing, interests) using a system prompt with static content.
 
 ## Next (near-term)
 
@@ -34,16 +35,10 @@ Goal: during a live talk, you ask a question → audience opens a deep link → 
   - “Presenter mode” results screen (big numbers + animations)
   - QR code + short link for the audience
 
-### Harel chatbot (Coming soon)
+### Harel chatbot (Future enhancements)
 
-Goal: a chatbot that answers questions about Harel’s content (talks, writing, projects) and helps visitors find the right material.
-
-- Start with a strict scope:
-  - Answer only about public site content
-  - Cite sources (pages/posts)
-- Later:
-  - RAG over MDX/content index
-  - Chat UI + conversation history (privacy-first)
+- RAG over MDX/content index for more accurate answers with source citations
+- Conversation history (privacy-first storage)
 
 ## Decisions (current assumptions)
 

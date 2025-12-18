@@ -7,18 +7,82 @@ alwaysApply: true
 
 # Workshop docs rule (repo → ../ai-driven)
 
-When implementing features in this repo:
+## Workflow
+
+```mermaid
+graph LR
+    A[Implement Feature] --> B{Meaningful Change?}
+    B -->|Yes| C[Write Code]
+    B -->|No| D[Skip Doc]
+    C --> E[Create/Update Workshop Doc]
+    E --> F[Add to ../ai-driven/workshop/]
+    F --> G[Structure: Goal → Steps → Verify]
+    G --> H[Test Doc Works Live]
+    
+    style A fill:#2d5016,stroke:#4a7c2a,color:#e8f5e9
+    style E fill:#5c4e1f,stroke:#8b7a3a,color:#fff9e6
+    style H fill:#2d5016,stroke:#4a7c2a,color:#e8f5e9
+```
+
+## Workshop Doc Structure
+
+```mermaid
+graph TD
+    A[Workshop Doc] --> B[Goal]
+    A --> C[Prereqs]
+    A --> D[Live Steps]
+    A --> E[Verification]
+    A --> F[Common Failures]
+    A --> G[Appendix Optional]
+    
+    B --> B1[What we're building]
+    C --> C1[What you need first]
+    D --> D1[Numbered commands<br/>Copy/paste ready]
+    E --> E1[How to confirm success]
+    F --> F1[Symptom → Fix]
+    G --> G1[Why & Troubleshooting]
+    
+    style A fill:#5c4e1f,stroke:#8b7a3a,color:#fff9e6
+    style D fill:#2d5016,stroke:#4a7c2a,color:#e8f5e9
+    style D1 fill:#2d5016,stroke:#4a7c2a,color:#e8f5e9
+```
+
+## Repository Relationship
+
+```mermaid
+graph LR
+    PW[personal-website<br/>Implementation] -->|Creates docs in| AI[ai-driven/workshop<br/>Documentation]
+    AI -->|Teaches from| PW
+    
+    PW --> PW1[app/components/]
+    PW --> PW2[app/api/]
+    PW --> PW3[lib/]
+    
+    AI --> AI1[workshop/01-feature.md]
+    AI --> AI2[workshop/02-feature.md]
+    
+    style PW fill:#2d5016,stroke:#4a7c2a,color:#e8f5e9
+    style AI fill:#5c4e1f,stroke:#8b7a3a,color:#fff9e6
+```
+
+## When implementing features:
 
 - Write changes **as if you will teach them live**.
 - For every meaningful change, add/update a short doc in `../ai-driven/workshop/` with:
-  - **Goal**
-  - **Prereqs**
-  - **Live steps** (numbered, copy/paste commands)
-  - **Verification** (how to confirm it worked)
-  - **Common failures** (symptom → fix)
-- Prefer **checklist-first**, then add a small **Appendix** with the “why” and troubleshooting.
+  - **Goal** - What we're building and why
+  - **Prereqs** - What you need before starting
+  - **Live steps** - Numbered, copy/paste commands
+  - **Verification** - How to confirm it worked
+  - **Common failures** - Symptom → fix pairs
+- Prefer **checklist-first**, then add a small **Appendix** with the "why" and troubleshooting.
 - Keep docs concise and demo-friendly: short sections, clear headings, minimal fluff.
 
-Tip: open the workshop repo quickly:
+## Quick Access
 
-- `cd ../ai-driven && ls workshop/`
+```bash
+# Open workshop repo
+cd ../ai-driven && ls workshop/
+
+# Create new workshop doc
+cd ../ai-driven/workshop && touch XX-feature-name.md
+```

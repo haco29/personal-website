@@ -1,0 +1,44 @@
+---
+description: Patterns for rendering markdown content with react-markdown
+globs:
+  - "**/*markdown*.{tsx,ts}"
+  - "**/*Markdown*.{tsx,ts}"
+---
+
+# Markdown Rendering Patterns
+
+## Code Block Detection
+
+**Problem**: Fenced code blocks without language classes may be misidentified as inline code.
+
+**Solution**: Use React Context to detect when code is inside a `<pre>` element (fenced blocks are always wrapped in `<pre>`).
+
+```tsx
+// ✅ Good - Context-based detection
+const PreContext = createContext(false);
+
+function CodeComponent({ className, children, ...props }) {
+  const isInsidePre = useContext(PreContext);
+  const isBlock = isInsidePre || (className !== undefined && className !== null);
+  // ...
+}
+
+// In components:
+pre: ({ children, ...props }) => (
+  <PreContext.Provider value={true}>
+    <pre {...props}>{children}</pre>
+  </PreContext.Provider>
+),
+```
+
+## Style Constants
+
+Extract repeated markdown component styles to constants for maintainability.
+
+```tsx
+// ✅ Good - shared styles
+const MARKDOWN_STYLES = {
+  codeInline: "rounded bg-zinc-100 px-1.5 py-0.5",
+  codeBlock: "block overflow-x-auto rounded-lg bg-zinc-100 p-3",
+} as const;
+```

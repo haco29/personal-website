@@ -9,7 +9,7 @@ export function Footer() {
       <Container>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            © {year} {profile.name}. Built with Next.js.
+            © {year} {profile.name}.
           </p>
           <div className="flex flex-wrap gap-2">
             {profile.links.map((l) => (
