@@ -3,6 +3,7 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useEffect, useRef, useState } from "react";
+import { MarkdownRenderer } from "./MarkdownRenderer";
 
 type TextPart = { type: "text"; text: string };
 type MessagePart = TextPart | { type: string; [key: string]: unknown };
@@ -93,7 +94,11 @@ export function Chat({ inputRef }: ChatProps) {
                         : "border border-black/10 bg-white text-zinc-950 dark:border-white/15 dark:bg-black dark:text-zinc-50"
                     }`}
                   >
-                    <div className="text-sm leading-relaxed whitespace-pre-wrap">{textParts}</div>
+                    {role === "assistant" ? (
+                      <MarkdownRenderer content={textParts} />
+                    ) : (
+                      <div className="text-sm leading-relaxed whitespace-pre-wrap">{textParts}</div>
+                    )}
                   </div>
                 </div>
               );

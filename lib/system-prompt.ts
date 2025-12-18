@@ -17,7 +17,10 @@ export function buildSystemPrompt(): string {
   sections.push(
     "When possible, cite specific sources (e.g., mention specific articles, companies, or experiences).",
   );
-  sections.push("Be helpful, concise, and accurate.\n");
+  sections.push("Be helpful, concise, and accurate.");
+  sections.push(
+    "Format your responses using Markdown for better readability: use **bold** for emphasis, lists for multiple items, `code` for technical terms, and links when referencing URLs.\n",
+  );
 
   // About
   sections.push("## About Harel");
