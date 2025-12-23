@@ -50,22 +50,6 @@ export default function LifePage() {
               <p className="text-base leading-7 text-zinc-600 dark:text-zinc-400">
                 {life.family.copy}
               </p>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-500">
-                Debug tip: open{" "}
-                <a
-                  className="underline underline-offset-4 hover:text-zinc-700 dark:hover:text-zinc-300"
-                  href={life.family.photo.src}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {life.family.photo.src}
-                </a>{" "}
-                in a new tab. If it’s a 404, the filename/path doesn’t match what’s in{" "}
-                <code className="rounded bg-black/5 px-2 py-1 text-xs dark:bg-white/10">
-                  content/life.ts
-                </code>
-                .
-              </p>
             </div>
 
             <div className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm shadow-black/5 dark:border-white/15 dark:bg-black dark:shadow-none">
