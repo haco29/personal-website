@@ -2,7 +2,7 @@
 description: Testing standards (Phase 1: unit + integration) for personal-website
 globs:
   - "personal-website/**/*.{ts,tsx}"
-  - "personal-website/tests/**/*.{ts,tsx}"
+  - "personal-website/tests/**/*.{ts,tsx}1"
 ---
 
 ## Goal
