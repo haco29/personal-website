@@ -158,4 +158,3 @@ Structure: **Goal → Prereqs → Live steps → Verification → Common failure
   - **Logos + text**
   - **Decorative (non-clickable)**
   - **No ordering requirements**
-
