@@ -1,18 +1,12 @@
 import type { ReactElement } from "react";
 import { render, screen } from "@testing-library/react";
 
+import RootLayout from "../../app/layout";
 import HomePage from "../../app/page";
 import LifePage from "../../app/life/page";
 import WritingPage from "../../app/writing/page";
-import { BottomMarquee } from "../../app/components/BottomMarquee";
 
-const renderPageWithMarquee = (page: ReactElement) =>
-  render(
-    <div>
-      {page}
-      <BottomMarquee />
-    </div>,
-  );
+const renderPageWithLayout = (page: ReactElement) => render(<RootLayout>{page}</RootLayout>);
 
 describe("Home page (integration)", () => {
   it("renders the primary call-to-action to email", () => {
@@ -23,19 +17,19 @@ describe("Home page (integration)", () => {
   });
 
   it("shows the marquee on the home page", () => {
-    renderPageWithMarquee(<HomePage />);
+    renderPageWithLayout(<HomePage />);
 
     expect(screen.getByRole("heading", { name: "Community & Impact" })).toBeVisible();
   });
 
   it("shows the marquee on the life page", () => {
-    renderPageWithMarquee(<LifePage />);
+    renderPageWithLayout(<LifePage />);
 
     expect(screen.getByRole("heading", { name: "Community & Impact" })).toBeVisible();
   });
 
   it("shows the marquee on the writing page", () => {
-    renderPageWithMarquee(<WritingPage />);
+    renderPageWithLayout(<WritingPage />);
 
     expect(screen.getByRole("heading", { name: "Community & Impact" })).toBeVisible();
   });

@@ -14,5 +14,9 @@ describe("BottomMarquee", () => {
     ["Acme Corp", "Globex", "TechConf (Guest Lecture)"].forEach((name) => {
       expect(listScope.getByText(name)).toBeVisible();
     });
+
+    const lists = screen.getAllByRole("list", { hidden: true });
+    expect(lists).toHaveLength(2);
+    expect(lists[1]).toHaveAttribute("aria-hidden", "true");
   });
 });
