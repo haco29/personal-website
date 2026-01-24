@@ -6,6 +6,7 @@ import "./globals.css";
 import { Nav } from "./components/Nav";
 import { Footer } from "./components/Footer";
 import { ChatWidget } from "./components/ChatWidget";
+import { BottomMarquee } from "./components/BottomMarquee";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -88,7 +89,10 @@ export default function RootLayout({
         />
         <div className="min-h-screen bg-zinc-50 text-zinc-950 dark:bg-black dark:text-zinc-50">
           <Nav />
-          <main className="pb-16">{children}</main>
+          <main className="pb-16">
+            {children}
+            <BottomMarquee />
+          </main>
           <Footer />
           <ChatWidget />
         </div>
