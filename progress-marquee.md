@@ -4,7 +4,18 @@ This file tracks the implementation of a **site-wide, auto-scrolling marquee** (
 
 ## Status Summary
 
-**Status**: ⏳ **PLANNED**
+**Status**: 🚧 **IN PROGRESS**
+
+**Completed**:
+
+- PR 1: Social proof data + assets
+- PR 2: Marquee component (CSS-first, accessible)
+- Workshop doc added in `../ai-driven/workshop/13-social-proof-marquee.md`
+
+**Next up**:
+
+- PR 3: Integrate globally above footer
+- PR 4: Tests + a11y guardrails
 
 ## PR Quality Gates (enforced on every PR)
 
@@ -97,6 +108,8 @@ Add “social proof” to every page without adding UI complexity:
 - Automated:
   - `pnpm check`
 
+**Progress**: ✅ Completed (`pnpm check` passes locally)
+
 ---
 
 ### PR 3: Integrate globally above footer
@@ -151,6 +164,8 @@ After PR 2 or PR 3 lands (first meaningful user-facing change), add a short work
 - `../ai-driven/workshop/`
 
 Structure: **Goal → Prereqs → Live steps → Verification → Common failures**.
+
+**Progress**: ✅ Added `../ai-driven/workshop/13-social-proof-marquee.md`
 
 ## Open Questions
 
