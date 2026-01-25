@@ -16,8 +16,8 @@
 | PR  | Title                         | Goal                             | Status    | Steps | Branch                    |
 | --- | ----------------------------- | -------------------------------- | --------- | ----- | ------------------------- |
 | 0   | Data Source                   | Create carousel data list        | Completed | 1-2   | `feat/carousel-data`      |
-| 1   | Marquee Component + Styles    | Build the endless carousel       | Pending | 3-8   | `feat/carousel-marquee`   |
-| 2   | Site-wide Integration + Tests | Place above footer, add coverage | Pending | 9-12  | `feat/carousel-integrate` |
+| 1   | Marquee Component + Styles    | Build the endless carousel       | Pending   | 3-8   | `feat/carousel-marquee`   |
+| 2   | Site-wide Integration + Tests | Place above footer, add coverage | Pending   | 9-12  | `feat/carousel-integrate` |
 
 ---
 
