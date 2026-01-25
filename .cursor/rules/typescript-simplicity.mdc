@@ -1,0 +1,11 @@
+---
+description: Keep TypeScript simple and avoid over-engineering
+alwaysApply: true
+---
+
+# TypeScript Simplicity
+
+- Prefer the simplest correct typing. Avoid advanced TypeScript patterns unless they provide clear, immediate value.
+- Do not introduce `as const`, `satisfies`, or complex generics for basic data lists unless they are required by usage.
+- If a more complex type is truly needed, explain why in a short comment or message.
+- When in doubt, start with a plain, readable type annotation and keep the data structure easy to edit.
