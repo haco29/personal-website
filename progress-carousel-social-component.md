@@ -67,7 +67,7 @@
 
 #### STEP-003: Create marquee component
 
-- **Status**: Pending
+- **Status**: Completed
 - **Description**: Add `TagCarousel` component rendering a duplicated list for seamless looping.
 - **Files**: `app/components/TagCarousel.tsx`
 - **Success Criteria**: Component renders tags with list semantics (`section`, `ul`, `li`).
@@ -76,7 +76,7 @@
 
 #### STEP-004: Add CSS animation
 
-- **Status**: Pending
+- **Status**: Completed
 - **Description**: Add keyframes + utility classes for a smooth marquee.
 - **Files**: `app/globals.css`
 - **Success Criteria**: Marquee animates horizontally without jitter.
@@ -85,8 +85,8 @@
 
 #### STEP-005: Add a11y guardrails
 
-- **Status**: Pending
-- **Description**: Respect `prefers-reduced-motion` and pause on hover/focus.
+- **Status**: Completed
+- **Description**: Respect `prefers-reduced-motion` and pause on hover/focus (focus pause triggers when focusable children are introduced).
 - **Files**: `app/components/TagCarousel.tsx`, `app/globals.css`
 - **Success Criteria**: Motion stops in reduced-motion mode; hover/focus pauses.
 - **Testing**: OS reduced-motion toggle + keyboard focus test.
@@ -94,7 +94,7 @@
 
 #### STEP-006: Add spacing/visual polish
 
-- **Status**: Pending
+- **Status**: Completed
 - **Description**: Match site styling (borders, background, spacing).
 - **Files**: `app/components/TagCarousel.tsx`
 - **Success Criteria**: Visual consistency with current design system.
@@ -103,8 +103,8 @@
 
 #### STEP-007: Document carousel behavior
 
-- **Status**: Pending
-- **Description**: Add brief notes in progress doc or inline comments if needed.
+- **Status**: Completed
+- **Description**: Documented reduced-motion opt-out and hover/focus pause behavior.
 - **Files**: `progress-carousel-social-component.md`
 - **Success Criteria**: Clear rationale for a11y behavior.
 - **Testing**: N/A
