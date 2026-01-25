@@ -9,6 +9,9 @@ export function TagCarousel() {
       className="border-y border-black/5 py-6 dark:border-white/10"
     >
       <Container>
+        <p className="mb-3 text-xs font-semibold tracking-wide text-zinc-500 uppercase dark:text-zinc-400">
+          Community posts
+        </p>
         <div className="tag-carousel__viewport rounded-3xl border border-black/10 bg-white/70 px-4 py-3 shadow-sm shadow-black/5 dark:border-white/15 dark:bg-black/60 dark:shadow-none">
           <div className="tag-carousel__track">
             <ul className="tag-carousel__list">
