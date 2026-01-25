@@ -13,9 +13,9 @@
 
 ## PR Breakdown Summary
 
-| PR  | Title                         | Goal                             | Status  | Steps | Branch                    |
-| --- | ----------------------------- | -------------------------------- | ------- | ----- | ------------------------- |
-| 0   | Data Source                   | Create carousel data list        | Pending | 1-2   | `feat/carousel-data`      |
+| PR  | Title                         | Goal                             | Status    | Steps | Branch                    |
+| --- | ----------------------------- | -------------------------------- | --------- | ----- | ------------------------- |
+| 0   | Data Source                   | Create carousel data list        | Completed | 1-2   | `feat/carousel-data`      |
 | 1   | Marquee Component + Styles    | Build the endless carousel       | Pending | 3-8   | `feat/carousel-marquee`   |
 | 2   | Site-wide Integration + Tests | Place above footer, add coverage | Pending | 9-12  | `feat/carousel-integrate` |
 
@@ -33,18 +33,18 @@
 
 #### STEP-001: Decide and create data source
 
-- **Status**: Pending
-- **Description**: Create a dedicated data list (new file or existing content module).
-- **Files**: `content/profile.ts` (or new `content/tags.ts`)
+- **Status**: Completed
+- **Description**: Created a dedicated data list file for the carousel items.
+- **Files**: `content/carousel.ts`
 - **Success Criteria**: List exists as a typed array and is easy to maintain.
 - **Testing**: Typecheck passes.
 - **Commit**: `feat(carousel): add tag list`
 
 #### STEP-002: Export for component usage
 
-- **Status**: Pending
-- **Description**: Export the list in a stable shape for the carousel component.
-- **Files**: `content/profile.ts` (or new `content/tags.ts`)
+- **Status**: Completed
+- **Description**: Exported a stable item shape for future label/description/avatar usage.
+- **Files**: `content/carousel.ts`
 - **Success Criteria**: Named export is available and documented in code.
 - **Testing**: Typecheck passes.
 - **Commit**: `feat(carousel): export tag list`
