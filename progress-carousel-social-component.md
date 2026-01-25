@@ -13,11 +13,11 @@
 
 ## PR Breakdown Summary
 
-| PR | Title                         | Goal                               | Status  | Steps | Branch                     |
-|----|-------------------------------|------------------------------------|---------|-------|----------------------------|
-| 0  | Data Source                   | Create carousel data list          | Pending | 1-2   | `feat/carousel-data`       |
-| 1  | Marquee Component + Styles    | Build the endless carousel         | Pending | 3-8   | `feat/carousel-marquee`    |
-| 2  | Site-wide Integration + Tests | Place above footer, add coverage   | Pending | 9-12  | `feat/carousel-integrate`  |
+| PR  | Title                         | Goal                             | Status  | Steps | Branch                    |
+| --- | ----------------------------- | -------------------------------- | ------- | ----- | ------------------------- |
+| 0   | Data Source                   | Create carousel data list        | Pending | 1-2   | `feat/carousel-data`      |
+| 1   | Marquee Component + Styles    | Build the endless carousel       | Pending | 3-8   | `feat/carousel-marquee`   |
+| 2   | Site-wide Integration + Tests | Place above footer, add coverage | Pending | 9-12  | `feat/carousel-integrate` |
 
 ---
 
@@ -32,6 +32,7 @@
 ### Steps
 
 #### STEP-001: Decide and create data source
+
 - **Status**: Pending
 - **Description**: Create a dedicated data list (new file or existing content module).
 - **Files**: `content/profile.ts` (or new `content/tags.ts`)
@@ -40,6 +41,7 @@
 - **Commit**: `feat(carousel): add tag list`
 
 #### STEP-002: Export for component usage
+
 - **Status**: Pending
 - **Description**: Export the list in a stable shape for the carousel component.
 - **Files**: `content/profile.ts` (or new `content/tags.ts`)
@@ -48,6 +50,7 @@
 - **Commit**: `feat(carousel): export tag list`
 
 ### PR 0 Testing Checklist
+
 - `pnpm typecheck`
 
 ---
@@ -63,6 +66,7 @@
 ### Steps
 
 #### STEP-003: Create marquee component
+
 - **Status**: Pending
 - **Description**: Add `TagCarousel` component rendering a duplicated list for seamless looping.
 - **Files**: `app/components/TagCarousel.tsx`
@@ -71,6 +75,7 @@
 - **Commit**: `feat(carousel): add marquee component`
 
 #### STEP-004: Add CSS animation
+
 - **Status**: Pending
 - **Description**: Add keyframes + utility classes for a smooth marquee.
 - **Files**: `app/globals.css`
@@ -79,6 +84,7 @@
 - **Commit**: `feat(carousel): add marquee animation`
 
 #### STEP-005: Add a11y guardrails
+
 - **Status**: Pending
 - **Description**: Respect `prefers-reduced-motion` and pause on hover/focus.
 - **Files**: `app/components/TagCarousel.tsx`, `app/globals.css`
@@ -87,6 +93,7 @@
 - **Commit**: `feat(carousel): add a11y motion guards`
 
 #### STEP-006: Add spacing/visual polish
+
 - **Status**: Pending
 - **Description**: Match site styling (borders, background, spacing).
 - **Files**: `app/components/TagCarousel.tsx`
@@ -95,6 +102,7 @@
 - **Commit**: `style(carousel): align with site design`
 
 #### STEP-007: Document carousel behavior
+
 - **Status**: Pending
 - **Description**: Add brief notes in progress doc or inline comments if needed.
 - **Files**: `progress-carousel-social-component.md`
@@ -103,6 +111,7 @@
 - **Commit**: `docs(carousel): note a11y behavior`
 
 ### PR 1 Testing Checklist
+
 - `pnpm lint`
 - `pnpm typecheck`
 - Manual: verify motion, pause on hover/focus, reduced-motion stops
@@ -120,6 +129,7 @@
 ### Steps
 
 #### STEP-009: Integrate in global layout
+
 - **Status**: Pending
 - **Description**: Render `TagCarousel` between `<main>` and `<Footer>` in `app/layout.tsx`.
 - **Files**: `app/layout.tsx`
@@ -128,6 +138,7 @@
 - **Commit**: `feat(carousel): render above footer`
 
 #### STEP-010: Add integration test
+
 - **Status**: Pending
 - **Description**: Update integration test(s) to assert carousel presence.
 - **Files**: `tests/integration/home-page.test.tsx` (or new test)
@@ -136,6 +147,7 @@
 - **Commit**: `test(carousel): assert global render`
 
 #### STEP-011: Update a11y expectations in tests
+
 - **Status**: Pending
 - **Description**: Ensure reduced-motion behavior is mocked if needed.
 - **Files**: `tests/setup.tsx` (if mocking matchMedia)
@@ -144,6 +156,7 @@
 - **Commit**: `test(carousel): stabilize motion media`
 
 #### STEP-012: Visual verification sweep
+
 - **Status**: Pending
 - **Description**: Quick manual check in light/dark mode.
 - **Files**: N/A
@@ -152,6 +165,7 @@
 - **Commit**: N/A
 
 ### PR 2 Testing Checklist
+
 - `pnpm test:integration`
 - Manual: verify placement on all pages, no overlap
 
@@ -167,18 +181,21 @@
 ## Risk Assessment
 
 ### Low Risk
+
 - UI-only changes, no data or API changes.
 
 ### Medium Risk
+
 - Motion settings or animation glitches on different browsers.
 
 ### Mitigations
+
 - Use CSS-only animation, reduced-motion opt-out, pause on hover/focus.
 
 ---
 
 ## Notes & References
 
-- Reference site: https://www.coderabbit.ai/  
-- Carousel inspiration: https://ui.shadcn.com/docs/components/radix/carousel  
+- Reference site: https://www.coderabbit.ai/
+- Carousel inspiration: https://ui.shadcn.com/docs/components/radix/carousel
 - Accessibility: WCAG 2.2.2 (Pause, Stop, Hide) and prefers-reduced-motion
