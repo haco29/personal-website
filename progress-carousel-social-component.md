@@ -16,8 +16,8 @@
 | PR  | Title                         | Goal                             | Status    | Steps | Branch                    |
 | --- | ----------------------------- | -------------------------------- | --------- | ----- | ------------------------- |
 | 0   | Data Source                   | Create carousel data list        | Completed | 1-2   | `feat/carousel-data`      |
-| 1   | Marquee Component + Styles    | Build the endless carousel       | Pending   | 3-8   | `feat/carousel-marquee`   |
-| 2   | Site-wide Integration + Tests | Place above footer, add coverage | Pending   | 9-12  | `feat/carousel-integrate` |
+| 1   | Marquee Component + Styles    | Build the endless carousel       | Completed | 3-8   | `feat/carousel-marquee`   |
+| 2   | Site-wide Integration + Tests | Place above footer, add coverage | Completed | 9-12  | `feat/carousel-integrate` |
 
 ---
 
@@ -130,8 +130,8 @@
 
 #### STEP-009: Integrate in global layout
 
-- **Status**: Pending
-- **Description**: Render `TagCarousel` between `<main>` and `<Footer>` in `app/layout.tsx`.
+- **Status**: Completed
+- **Description**: Render `TagCarousel` between `<main>` and `<Footer>` in `app/layout.tsx`, with a subtle "Community posts" label.
 - **Files**: `app/layout.tsx`
 - **Success Criteria**: Carousel appears above footer on all pages.
 - **Testing**: Manual check on `/`, `/about`, `/life`, `/writing`.
@@ -139,7 +139,7 @@
 
 #### STEP-010: Add integration test
 
-- **Status**: Pending
+- **Status**: Completed
 - **Description**: Update integration test(s) to assert carousel presence.
 - **Files**: `tests/integration/home-page.test.tsx` (or new test)
 - **Success Criteria**: Test asserts carousel region exists (ARIA label).
@@ -148,7 +148,7 @@
 
 #### STEP-011: Update a11y expectations in tests
 
-- **Status**: Pending
+- **Status**: Completed
 - **Description**: Ensure reduced-motion behavior is mocked if needed.
 - **Files**: `tests/setup.tsx` (if mocking matchMedia)
 - **Success Criteria**: Tests stable with motion queries.
@@ -157,7 +157,7 @@
 
 #### STEP-012: Visual verification sweep
 
-- **Status**: Pending
+- **Status**: Completed
 - **Description**: Quick manual check in light/dark mode.
 - **Files**: N/A
 - **Success Criteria**: No overlap with footer, consistent spacing.
