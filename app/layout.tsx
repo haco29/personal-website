@@ -6,6 +6,7 @@ import "./globals.css";
 import { Nav } from "./components/Nav";
 import { Footer } from "./components/Footer";
 import { ChatWidget } from "./components/ChatWidget";
+import { TagCarousel } from "./components/TagCarousel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,11 +51,23 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+type RootLayoutProps = Readonly<{
   children: React.ReactNode;
-}>) {
+}>;
+
+export function RootLayoutContent({ children }: RootLayoutProps) {
+  return (
+    <div className="min-h-screen bg-zinc-50 text-zinc-950 dark:bg-black dark:text-zinc-50">
+      <Nav />
+      <main className="pb-16">{children}</main>
+      <TagCarousel />
+      <Footer />
+      <ChatWidget />
+    </div>
+  );
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -86,12 +99,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify([websiteJsonLd, personJsonLd]) }}
         />
-        <div className="min-h-screen bg-zinc-50 text-zinc-950 dark:bg-black dark:text-zinc-50">
-          <Nav />
-          <main className="pb-16">{children}</main>
-          <Footer />
-          <ChatWidget />
-        </div>
+        <RootLayoutContent>{children}</RootLayoutContent>
         <SpeedInsights />
         <Analytics />
       </body>

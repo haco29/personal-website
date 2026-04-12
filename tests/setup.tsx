@@ -5,6 +5,11 @@ import { vi } from "vitest";
 // Keep mocks minimal and only at framework boundaries.
 // We want tests to exercise real component behavior (RTL style), not Next internals.
 
+vi.mock("next/font/google", () => ({
+  Geist: () => ({ variable: "--font-geist-sans" }),
+  Geist_Mono: () => ({ variable: "--font-geist-mono" }),
+}));
+
 vi.mock("next/image", () => {
   function NextImage({
     alt,
@@ -44,3 +49,16 @@ vi.mock("next/link", () => {
 
 // Mock scrollIntoView for jsdom (used by Chat component)
 Element.prototype.scrollIntoView = vi.fn();
+
+if (!window.matchMedia) {
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+}

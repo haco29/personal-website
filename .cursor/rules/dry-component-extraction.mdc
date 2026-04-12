@@ -1,0 +1,50 @@
+---
+description: Enforce extracting shared JSX into reusable components
+alwaysApply: true
+---
+
+# DRY Component Extraction
+
+- When JSX repeats with the same structure, extract it into a reusable component.
+- Keep the extracted component in the same file unless it’s reused across files.
+- Prefer simple props and avoid over-abstracting.
+
+## Example
+
+```tsx
+// ❌ Bad: duplicated card markup
+<ul>
+  {items.map((item) => (
+    <li key={item.id}>
+      <CardMarkup item={item} />
+    </li>
+  ))}
+</ul>
+<ul aria-hidden="true">
+  {items.map((item) => (
+    <li key={`${item.id}-dup`}>
+      <CardMarkup item={item} />
+    </li>
+  ))}
+</ul>
+
+// ✅ Good: extract shared JSX
+function CarouselCard({ item }: { item: Item }) {
+  return <article>{item.title}</article>;
+}
+
+<ul>
+  {items.map((item) => (
+    <li key={item.id}>
+      <CarouselCard item={item} />
+    </li>
+  ))}
+</ul>
+<ul aria-hidden="true">
+  {items.map((item) => (
+    <li key={`${item.id}-dup`}>
+      <CarouselCard item={item} />
+    </li>
+  ))}
+</ul>
+```

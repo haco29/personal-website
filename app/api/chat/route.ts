@@ -6,11 +6,12 @@ import { buildSystemPrompt } from "@/lib/system-prompt";
 // - Production: Vercel automatically injects VERCEL_OIDC_TOKEN
 // - Local with `vc dev`: Automatically injects VERCEL_OIDC_TOKEN
 // - Local with `next dev`: Requires VERCEL_OIDC_TOKEN from `vc env pull` OR use `pnpm dev:vercel`
-// Note: Using "anthropic/claude-3.5-sonnet" requires AI Gateway auth (OIDC token), not ANTHROPIC_API_KEY
+// Note: Using Anthropic models via AI Gateway requires OIDC auth, not ANTHROPIC_API_KEY
 export const runtime = "nodejs";
 
 // Limits to prevent abuse
 const MAX_MESSAGES_PER_REQUEST = 10;
+const CHAT_MODEL = "anthropic/claude-sonnet-4.5";
 
 export async function POST(req: Request) {
   try {
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
     // Uses AI Gateway with VERCEL_OIDC_TOKEN (automatically available in production or with `vc dev`)
     // For local dev with `next dev`, run `vc env pull` first or use `pnpm dev:vercel`
     const result = streamText({
-      model: "anthropic/claude-3.5-sonnet",
+      model: CHAT_MODEL,
       system: systemPrompt,
       messages: coreMessages,
     });
