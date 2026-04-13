@@ -6,12 +6,12 @@ import { buildSystemPrompt } from "@/lib/system-prompt";
 // - Production: Vercel automatically injects VERCEL_OIDC_TOKEN
 // - Local with `vc dev`: Automatically injects VERCEL_OIDC_TOKEN
 // - Local with `next dev`: Requires VERCEL_OIDC_TOKEN from `vc env pull` OR use `pnpm dev:vercel`
-// Note: Using Anthropic models via AI Gateway requires OIDC auth, not ANTHROPIC_API_KEY
+// Note: Using models via AI Gateway requires OIDC auth, not provider-specific API keys
 export const runtime = "nodejs";
 
 // Limits to prevent abuse
 const MAX_MESSAGES_PER_REQUEST = 10;
-const CHAT_MODEL = "anthropic/claude-sonnet-4.5";
+const CHAT_MODEL = "google/gemini-2.0-flash";
 
 export async function POST(req: Request) {
   try {
