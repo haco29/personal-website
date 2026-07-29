@@ -48,7 +48,7 @@ This document covers how the chatbot works in local development and production, 
 
 - **Runtime**: Node.js
 - **Authentication**: Automatic! When your project is linked to Vercel (`vc link`) and you're logged into Vercel CLI, the SDK automatically gets the OIDC token. No `.env.local` file needed.
-- **Model**: Anthropic Claude 3.5 Sonnet via Vercel AI Gateway
+- **Model**: Anthropic Claude Haiku 4.5 via Vercel AI Gateway (see `lib/chat-model.ts`)
 - **System Prompt**: Built from `content/profile.ts`, `content/writing.ts`, and `content/life.ts`
 
 **How it works**: The Vercel AI SDK detects that your project is linked to Vercel and automatically retrieves the OIDC token from your Vercel account. This happens transparently - you just run `pnpm dev` and it works!
@@ -80,7 +80,7 @@ This document covers how the chatbot works in local development and production, 
 
 - **Runtime**: Node.js (works reliably in production)
 - **Authentication**: Vercel automatically injects `VERCEL_OIDC_TOKEN` - no manual setup needed
-- **Model**: Anthropic Claude 3.5 Sonnet via Vercel AI Gateway
+- **Model**: Anthropic Claude Haiku 4.5 via Vercel AI Gateway (see `lib/chat-model.ts`)
 - **Deployment**: Automatic via Git push to main branch
 
 ### Deployment Steps
@@ -103,6 +103,10 @@ This document covers how the chatbot works in local development and production, 
 Vercel automatically provides:
 
 - `VERCEL_OIDC_TOKEN` - Automatically injected, no action needed
+
+Optional:
+
+- `CHAT_MODEL` - Overrides the model in `lib/chat-model.ts`. Set this to swap models without a code change — for example when a gateway slug is retired (see `tests/integration/chat-model.test.ts`). Must be a slug the AI Gateway currently serves.
 
 **Do NOT** add `ANTHROPIC_API_KEY` to production environment variables unless you want to override the OIDC token (not recommended).
 

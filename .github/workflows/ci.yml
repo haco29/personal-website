@@ -15,6 +15,9 @@ on:
     types: [opened, synchronize, reopened]
   push:
     branches: [main, master]
+  # Catches AI Gateway model retirements between PRs (see tests/integration/chat-model.test.ts)
+  schedule:
+    - cron: "0 6 * * 1"
 
 jobs:
   check:
