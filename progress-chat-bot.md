@@ -32,7 +32,7 @@ A chatbot that answers questions about Harel's content (talks, writing, projects
 ## Architecture
 
 - **Stack**: Next.js (App Router) on Vercel
-- **LLM**: Google Gemini 2.0 Flash (`google/gemini-2.0-flash`) via Vercel AI Gateway (uses Vercel account OIDC token, no API key needed)
+- **LLM**: Anthropic Claude Haiku 4.5 (`anthropic/claude-haiku-4-5`) via Vercel AI Gateway (uses Vercel account OIDC token, no API key needed). Configured in `lib/chat-model.ts`; override without a deploy via the `CHAT_MODEL` env var.
 - **SDK**: Vercel AI SDK with AI Gateway for streaming chat
 - **System Prompt**: Static content compiled from `content/profile.ts`, `content/writing.ts`, and `content/life.ts`
 
@@ -47,8 +47,8 @@ graph TB
     SystemPrompt -->|Read Content| Writing[content/writing.ts]
     SystemPrompt -->|Read Content| Life[content/life.ts]
     ChatAPI -->|Stream Request| VercelAI[Vercel AI Gateway]
-    VercelAI -->|OIDC Token Auth| Gemini[Google Gemini 2.0 Flash]
-    Gemini -->|Stream Response| VercelAI
+    VercelAI -->|OIDC Token Auth| Claude[Anthropic Claude Haiku 4.5]
+    Claude -->|Stream Response| VercelAI
     VercelAI -->|Stream Text| ChatAPI
     ChatAPI -->|Stream UI Messages| ChatWidget
     ChatWidget -->|Display Messages| User
@@ -56,7 +56,7 @@ graph TB
     style ChatWidget fill:#e1f5e1
     style ChatAPI fill:#e1f5e1
     style VercelAI fill:#fff4e1
-    style Gemini fill:#ffe1e1
+    style Claude fill:#ffe1e1
 ```
 
 ### Current Implementation Flow
@@ -68,7 +68,7 @@ sequenceDiagram
     participant ChatAPI
     participant SystemPrompt
     participant VercelAI
-    participant Gemini
+    participant Claude
 
     User->>ChatWidget: Click chat button
     ChatWidget->>ChatWidget: Open widget popup
@@ -78,8 +78,8 @@ sequenceDiagram
     SystemPrompt-->>ChatAPI: System prompt string
     ChatAPI->>VercelAI: streamText(model, system, messages)
     VercelAI->>VercelAI: Authenticate with OIDC token
-    VercelAI->>Gemini: API request with system prompt
-    Gemini-->>VercelAI: Stream tokens
+    VercelAI->>Claude: API request with system prompt
+    Claude-->>VercelAI: Stream tokens
     VercelAI-->>ChatAPI: Stream UI messages
     ChatAPI-->>ChatWidget: Stream response
     ChatWidget-->>User: Display streaming text
@@ -91,8 +91,8 @@ sequenceDiagram
 graph LR
     Attacker[Malicious User] -->|Unlimited Requests| ChatAPI[/api/chat Route]
     ChatAPI -->|No Rate Limiting| VercelAI[Vercel AI Gateway]
-    VercelAI -->|Consumes Tokens| Gemini[Gemini API]
-    Gemini -->|High Costs| Billing[Your Billing Account]
+    VercelAI -->|Consumes Tokens| Claude[Claude API]
+    Claude -->|High Costs| Billing[Your Billing Account]
 
     Attacker -.->|Attack Vector| TokenExhaustion[Token Quota Exhausted]
     Attacker -.->|Attack Vector| CostSpike[Unexpected Costs $100s-$1000s]
@@ -191,7 +191,7 @@ graph TB
 
 - ✅ Created `app/api/chat/route.ts`
 - ✅ Uses Vercel AI SDK `streamText` with Vercel AI Gateway
-- ✅ Model: `'google/gemini-2.0-flash'` (no API key needed - uses Vercel OIDC token)
+- ✅ Model: `anthropic/claude-haiku-4-5` via `lib/chat-model.ts` (no API key needed - uses Vercel OIDC token)
 - ✅ Note: Model selection has changed over time; treat `CHAT_MODEL` in `app/api/chat/route.ts` as the canonical source of truth.
 - ✅ Flow:
   1. Receive user message
@@ -517,7 +517,7 @@ The following PRs will be implemented in a future phase to add RAG capabilities,
 
 ## Decisions
 
-- **LLM**: Google Gemini 2.0 Flash (`google/gemini-2.0-flash`) via Vercel AI Gateway (no external API keys needed - uses Vercel account OIDC token)
+- **LLM**: Anthropic Claude Haiku 4.5 (`anthropic/claude-haiku-4-5`) via Vercel AI Gateway (no external API keys needed - uses Vercel account OIDC token)
 - **SDK**: Vercel AI SDK with AI Gateway (standard Vercel approach, supports streaming, no API key management)
 - **Authentication**: Vercel AI Gateway handles auth automatically via OIDC token when deployed; use `vc dev` for local development
 - **Approach**: System prompt with static content (MVP) - simpler, faster to ship, good enough for initial use

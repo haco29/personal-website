@@ -1,5 +1,6 @@
 import { streamText, convertToCoreMessages } from "ai";
 import { buildSystemPrompt } from "@/lib/system-prompt";
+import { CHAT_MODEL } from "@/lib/chat-model";
 
 // Node.js runtime: Reads .env.local properly for local dev
 // Authentication:
@@ -11,7 +12,6 @@ export const runtime = "nodejs";
 
 // Limits to prevent abuse
 const MAX_MESSAGES_PER_REQUEST = 10;
-const CHAT_MODEL = "google/gemini-2.0-flash";
 
 export async function POST(req: Request) {
   try {
@@ -59,6 +59,14 @@ export async function POST(req: Request) {
         {
           status: 401,
         },
+      );
+    }
+
+    // A retired gateway slug reads as "Model 'x' not found" - name the fix.
+    if (errorMessage.includes("not found") && errorMessage.includes(CHAT_MODEL)) {
+      return new Response(
+        `Model "${CHAT_MODEL}" is no longer available on the AI Gateway. Set the CHAT_MODEL env var to a current slug, or update lib/chat-model.ts.`,
+        { status: 502 },
       );
     }
 
