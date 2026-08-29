@@ -42,5 +42,14 @@ vi.mock("next/link", () => {
   return { default: NextLink };
 });
 
+vi.mock("next/font/google", () => ({
+  Geist: (options: { variable?: string } = {}) => ({
+    variable: options.variable ?? "",
+  }),
+  Geist_Mono: (options: { variable?: string } = {}) => ({
+    variable: options.variable ?? "",
+  }),
+}));
+
 // Mock scrollIntoView for jsdom (used by Chat component)
 Element.prototype.scrollIntoView = vi.fn();
